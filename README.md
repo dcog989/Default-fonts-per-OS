@@ -3,8 +3,8 @@ A list of default installed fonts for each operating system.
 
 Windows 11, macOS (Sonoma), iOS (18), Android (15), Ubuntu (24.10) default installed fonts are presented as:
 
-1. [a list of fonts, displayed with generic text that uses full alphabet + numerals](https://github.com/dcog989/Default-fonts-per-OS/blob/main/fonts-by-os-list-with-text.html)
-2. [a table of fonts, displayed in their corresponding font family](https://github.com/dcog989/Default-fonts-per-OS/blob/main/fonts-by-os-table.html)
+1. [a list of fonts, displayed with generic text that uses full alphabet + numerals](https://raw.githack.com/dcog989/Default-fonts-per-OS/main/fonts-by-os-list-with-text.html)
+2. [a table of fonts, displayed in their corresponding font family](https://raw.githack.com/dcog989/Default-fonts-per-OS/main/fonts-by-os-table.html)
 
 **Note: you will only see the correct font if it is installed on your system.**
 
