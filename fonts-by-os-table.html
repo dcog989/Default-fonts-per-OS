@@ -7,36 +7,45 @@
   <title>Fonts by OS</title>
   <style>
     body {
-      color: #444;
-      font-size: 18px;
-      margin: 20px auto;
-      width: 1200px;
+      background: #1a1a1a;
+      color: #ccc;
+      font-family: 'Source Code Pro', Consolas, 'Courier New', Courier, monospace;
+      font-size: 16px;
+      margin: 20px auto 40px;
+      padding: 20px auto 40px;
+      text-align: center;
     }
 
     .font-comparison-table {
-      margin: 0;
+      margin: 0 auto;
       border-collapse: collapse;
       margin-bottom: 20px;
     }
 
     .font-comparison-table th,
     .font-comparison-table td {
-      border: 1px solid #ccc;
-      padding: 4px 8px;
+      background-color: #2e2e2e;
+      border: 1px solid #666;
+      padding: 6px 12px;
       text-align: left;
     }
 
     .font-comparison-table th {
-      background-color: #f0f0f0;
+      background-color: #222;
       font-size: 24px;
       font-weight: bold;
     }
 
     .font-sample {
-      /* Increased font size for better readability */
       margin-bottom: 5px;
       display: block;
       padding: 5px;
+    }
+
+    .font-unavailable {
+      color: #df7a7a;
+      font-family: 'Source Code Pro', Consolas, 'Courier New', Courier, monospace !important;
+      font-weight: 600;
     }
   </style>
 </head>
@@ -67,7 +76,7 @@
           <span class="font-sample" style="font-family: 'Academy Engraved LET', fantasy;">Academy Engraved LET</span>
         </td>
         <td>
-          <span class="font-sample" style="font-family: Arial, sans-serif;">Arial</span>
+          <span class="font-sample" style="font-family: Roboto, sans-serif;">Roboto</span>
         </td>
         <td>
           <span class="font-sample" style="font-family: Arial, sans-serif;">Arial</span>
@@ -152,7 +161,7 @@
           <span class="font-sample" style="font-family: 'Arial Hebrew', sans-serif;">Arial Hebrew</span>
         </td>
         <td>
-          <span class="font-sample" style="font-family: Roboto, sans-serif;">Roboto</span>
+          <span class="font-sample" style="font-family: Arial, sans-serif;">Arial</span>
         </td>
         <td>
           <span class="font-sample" style="font-family: 'Free Mono', monospace;">Free Mono</span>
@@ -391,7 +400,7 @@
           <span class="font-sample" style="font-family: 'Palatino Linotype', serif;">Palatino Linotype</span>
         </td>
         <td>
-          <span class="font-sample" style="font-family: 'New York (NY)', serif;">New York (NY)</span>
+          <span class="font-sample" style="font-family: 'New York', serif;">New York</span>
         </td>
         <td>
           <span class="font-sample" style="font-family: 'Hoefler Text', serif;">Hoefler Text</span>
@@ -443,7 +452,7 @@
           <span class="font-sample" style="font-family: 'Segoe UI Emoji', sans-serif;">Segoe UI Emoji</span>
         </td>
         <td>
-          <span class="font-sample" style="font-family: 'SF Compact)', sans-serif;">SF Compact)</span>
+          <span class="font-sample" style="font-family: 'SF Compact', sans-serif;">SF Compact</span>
         </td>
         <td>
           <span class="font-sample" style="font-family: 'Marker Felt', cursive;">Marker Felt</span>
@@ -469,7 +478,7 @@
           <span class="font-sample" style="font-family: SimSun, serif;">SimSun</span>
         </td>
         <td>
-          <span class="font-sample" style="font-family: 'San Francisco (SF Pro', sans-serif;">San Francisco (SF Pro</span>
+          <span class="font-sample" style="font-family: 'SF Pro', sans-serif;">SF Pro</span>
         </td>
         <td>
           <span class="font-sample" style="font-family: Monaco, monospace;">Monaco</span>
@@ -485,7 +494,7 @@
           <span class="font-sample" style="font-family: 'Times New Roman', serif;">Times New Roman</span>
         </td>
         <td>
-          <span class="font-sample" style="font-family: 'New York (NY)', serif;">New York (NY)</span>
+          <span class="font-sample" style="font-family: 'New York', serif;">New York</span>
         </td>
         <td></td>
         <td></td>
@@ -540,7 +549,7 @@
         </td>
         <td></td>
         <td>
-          <span class="font-sample" style="font-family: 'SF Compact)', sans-serif;">SF Compact)</span>
+          <span class="font-sample" style="font-family: 'SF Compact', sans-serif;">SF Compact</span>
         </td>
         <td></td>
         <td></td>
@@ -562,7 +571,7 @@
         </td>
         <td></td>
         <td>
-          <span class="font-sample" style="font-family: 'San Francisco (SF Pro)', sans-serif;">San Francisco (SF Pro)</span>
+          <span class="font-sample" style="font-family: 'SF Pro', sans-serif;">SF Pro</span>
         </td>
         <td></td>
         <td></td>
@@ -614,6 +623,8 @@
       </tr>
     </tbody>
   </table>
+
+  <script>document.addEventListener("DOMContentLoaded", (function () { const i = {}, e = { testString: "QW@WIMNAi&l!", testSize: "72px", h: null, genericSerif: "serif", genericSans: "sans-serif", genericSerifDims: null, genericSansDims: null, init: function () { this.h = document.createElement("div"), this.h.style.cssText = "position:absolute; top:-9999px; left:-9999px; font-size:" + this.testSize + ";", document.body.appendChild(this.h), this.genericSerifDims = this.getDimensions(this.genericSerif), this.genericSansDims = this.getDimensions(this.genericSans) }, getDimensions: function (i) { const e = document.createElement("span"); e.style.fontFamily = i, e.textContent = this.testString, this.h.appendChild(e); const t = { width: e.offsetWidth, height: e.offsetHeight }; return this.h.removeChild(e), t }, isAvailable: function (e) { const t = e.toLowerCase(); if (void 0 !== i[t]) return i[t]; const n = this.getDimensions(`'${e}', ${this.genericSans}`); if (n.width !== this.genericSansDims.width || n.height !== this.genericSansDims.height) return i[t] = !0, !0; const s = this.getDimensions(`'${e}', ${this.genericSerif}`); return s.width !== this.genericSerifDims.width || s.height !== this.genericSerifDims.height ? (i[t] = !0, !0) : (i[t] = !1, !1) } }; e.init(), document.querySelectorAll(".font-sample, .font-name").forEach((function (i) { const t = i.style.fontFamily.split(",")[0].replace(/['"]/g, "").trim(); t && !e.isAvailable(t) && i.classList.add("font-unavailable") })) }))</script>
 
 </body>
 
