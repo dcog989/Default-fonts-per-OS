@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fonts by OS</title>
+    <link rel="icon" href="favicon.ico" sizes="16x16 24x24 32x32 48x48 64x64">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" sizes="any">
+    <link href="main.css" rel="stylesheet" />
+</head>
+
+<body>
+    <h1>Fonts by OS</h1>
+    <div class="controls-container">
+        <div class="controls">
+            <div class="control-group">
+                <strong>View:</strong>
+                <div class="switch-field" id="view-selector">
+                    <input type="radio" id="view-list" name="view" value="list" checked><label for="view-list">List</label>
+                    <input type="radio" id="view-table" name="view" value="table"><label for="view-table">Table</label>
+                    <input type="radio" id="view-compare" name="view" value="compare"><label for="view-compare" id="compare-label">Compare</label>
+                </div>
+            </div>
+            <div class="control-group">
+                <label for="font-size-selector"><strong>Font Size:</strong></label>
+                <select id="font-size-selector">
+                    <!-- Options will be populated by app.js -->
+                </select>
+            </div>
+            <div class="control-group">
+                <strong>Theme:</strong>
+                <div class="switch-field" id="theme-selector">
+                    <input type="radio" id="theme-light" name="theme" value="light"><label for="theme-light">Light</label>
+                    <input type="radio" id="theme-dark" name="theme" value="dark"><label for="theme-dark">Dark</label>
+                    <input type="radio" id="theme-auto" name="theme" value="auto"><label for="theme-auto">Auto</label>
+                </div>
+            </div>
+        </div>
+        <div class="controls">
+            <div class="control-group">
+                <strong>Filter:</strong>
+                <input type="search" id="search-input" placeholder="Search fonts...">
+            </div>
+            <div class="control-group">
+                <strong>Preview Text:</strong>
+                <input type="text" id="custom-text-input" placeholder="Type custom preview text...">
+            </div>
+            <div class="control-group">
+                <button id="copy-selected-button" disabled>Copy Selected to Clipboard</button>
+            </div>
+        </div>
+        <div class="controls" id="category-controls" style="display: none;">
+            <div class="control-group">
+                <strong>Category:</strong>
+                <div class="switch-field" id="category-selector"></div>
+            </div>
+            <div class="control-group">
+                <button id="clear-all-button">Clear All</button>
+            </div>
+        </div>
+    </div>
+    <div id="content">
+        <p>Loading fonts...</p>
+    </div>
+
+    <button id="back-to-top" title="Go to top">Top</button>
+
+    <script src="app.js" defer></script>
+</body>
+
+</html>
