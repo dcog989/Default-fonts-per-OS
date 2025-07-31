@@ -2,7 +2,7 @@
 
 A list of default installed fonts for each operating system, presented in an interactive HTML display.
 
-**[View the fonts!](index.html)**
+**[View the fonts!](https://rawcdn.githack.com/dcog989/Default-fonts-per-OS/82066fbac0aba7c0991e21f8ba11555e032c8675/index.html)**
 
 The page provides two views which can be changed at the top of the page: a list view with sample text, and a more compact table view.
 
