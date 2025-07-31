@@ -1,4 +1,4 @@
-# Fonts by OS
+# ![logo](https://github.com/dcog989/Default-fonts-per-OS/blob/main/favicon.svg) Fonts by OS
 
 A list of default installed fonts for each operating system, presented in an interactive HTML display.
 
