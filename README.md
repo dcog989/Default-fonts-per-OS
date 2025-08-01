@@ -2,11 +2,13 @@
 
 A list of default installed fonts for each operating system, presented in an interactive HTML display.
 
-**[View the fonts!](https://rawcdn.githack.com/dcog989/Default-fonts-per-OS/82066fbac0aba7c0991e21f8ba11555e032c8675/index.html)**
+**[Show me the fonts!](https://rawcdn.githack.com/dcog989/Default-fonts-per-OS/82066fbac0aba7c0991e21f8ba11555e032c8675/index.html)**
 
 The page provides two views which can be changed at the top of the page: a list view with sample text, and a more compact table view.
 
-**Note: for fonts that are not installed on your system, the text will be highlighted in red and displayed in monospace.**
+The fonts are stored in a JSON file so it's easy to add or update as needed.
+
+**Note: fonts not installed on your system are displayed in red monospace.**
 
 ## Operating Systems
 
