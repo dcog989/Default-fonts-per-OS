@@ -1,20 +1,7 @@
-window.addEventListener('load', () => {
+document.addEventListener('DOMContentLoaded', () => {
 
     const App = {
-        elements: {
-            content: document.getElementById('content'),
-            viewSelector: document.getElementById('view-selector'),
-            fontSizeSelector: document.getElementById('font-size-selector'),
-            themeSelector: document.getElementById('theme-selector'),
-            searchInput: document.getElementById('search-input'),
-            customTextInput: document.getElementById('custom-text-input'),
-            categorySelector: document.getElementById('category-selector'),
-            categoryControls: document.getElementById('category-controls'),
-            compareLabel: document.getElementById('compare-label'),
-            backToTopButton: document.getElementById('back-to-top'),
-            clearAllButton: document.getElementById('clear-all-button'),
-            copySelectedButton: document.getElementById('copy-selected-button'),
-        },
+        elements: {}, // Initialized as empty
 
         state: {
             fontData: null,
@@ -45,7 +32,6 @@ window.addEventListener('load', () => {
                 const dims = { width: span.offsetWidth, height: span.offsetHeight }; this.testContainer.removeChild(span); return dims;
             },
             isAvailable: function (font) {
-                // Lazy initialization: run init() only on the first check.
                 if (!this.testContainer) {
                     this.init();
                 }
@@ -64,9 +50,26 @@ window.addEventListener('load', () => {
             }
         },
 
+        cacheElements() {
+            this.elements = {
+                content: document.getElementById('content'),
+                viewSelector: document.getElementById('view-selector'),
+                fontSizeSelector: document.getElementById('font-size-selector'),
+                themeSelector: document.getElementById('theme-selector'),
+                searchInput: document.getElementById('search-input'),
+                customTextInput: document.getElementById('custom-text-input'),
+                categorySelector: document.getElementById('category-selector'),
+                categoryControls: document.getElementById('category-controls'),
+                compareLabel: document.getElementById('compare-label'),
+                backToTopButton: document.getElementById('back-to-top'),
+                clearAllButton: document.getElementById('clear-all-button'),
+                copySelectedButton: document.getElementById('copy-selected-button'),
+            };
+        },
+
         init(fontData) {
+            this.cacheElements(); // Populate elements now that DOM is ready
             this.state.fontData = fontData;
-            // The fontChecker is initialized lazily to prevent forcing a layout too early.
             this.populateFontSizeSelector();
             this.calculateWebSafeFonts();
             this.setupCategoryFilter();
