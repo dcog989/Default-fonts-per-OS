@@ -1,7 +1,7 @@
-window.addEventListener('load', () => {
+document.addEventListener('DOMContentLoaded', () => {
 
     const App = {
-        elements: {},
+        elements: {}, // Initialized as empty
 
         state: {
             fontData: null,
@@ -263,8 +263,15 @@ window.addEventListener('load', () => {
         },
     };
 
-    fetch('./data/fonts.json')
-        .then(response => { if (!response.ok) throw new Error(`Network response was not ok: ${response.statusText}`); return response.json(); })
-        .then(fontData => App.init(fontData))
-        .catch(error => { console.error('Error fetching or initializing app:', error); App.elements.content.innerHTML = '<p style="color:red;">Error loading font data. Please check fonts.json and the browser console for details.</p>'; });
+    // The fetch call is replaced with a direct initialization,
+    // using the global `fontData` variable from fonts.js.
+    if (typeof fontData !== 'undefined') {
+        App.init(fontData);
+    } else {
+        console.error('Error: fontData object not found. Ensure fonts.js is loaded before app.js.');
+        const content = document.getElementById('content');
+        if (content) {
+            content.innerHTML = '<p style="color:red;">Error loading font data. Please check the browser console for details.</p>';
+        }
+    }
 });

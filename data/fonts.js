@@ -1,4 +1,4 @@
-{
+const fontData = {
     "operatingSystems": [
         {
             "name": "Windows 11",
@@ -566,4 +566,4 @@
             ]
         }
     ]
-}
+};
