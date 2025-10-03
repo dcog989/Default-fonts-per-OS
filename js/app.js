@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('load', () => {
 
     const App = {
         elements: {
@@ -66,9 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         init(fontData) {
             this.state.fontData = fontData;
-            // The fontChecker is now initialized lazily, so we remove the explicit call from here
-            // to prevent forcing a layout too early.
-            // this.fontChecker.init();
+            // The fontChecker is initialized lazily to prevent forcing a layout too early.
             this.populateFontSizeSelector();
             this.calculateWebSafeFonts();
             this.setupCategoryFilter();
