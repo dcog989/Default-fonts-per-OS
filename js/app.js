@@ -74,8 +74,14 @@ document.addEventListener('DOMContentLoaded', () => {
             this.calculateWebSafeFonts();
             this.setupCategoryFilter();
             this.setupEventListeners();
-            this.loadPreferences();
-            this.render();
+
+            // Defer loading preferences and the initial render to the next event loop cycle.
+            // This ensures the browser has finished rendering all child DOM elements (like
+            // the radio buttons) before we try to interact with them, fixing the race condition.
+            setTimeout(() => {
+                this.loadPreferences();
+                this.render();
+            }, 0);
         },
 
         populateFontSizeSelector() {
