@@ -1,19 +1,23 @@
-# ![logo](https://github.com/dcog989/Default-fonts-per-OS/blob/main/favicon.svg) Fonts by OS
+# ![logo](favicon.svg) Fonts by OS
 
-A list of default installed fonts for each operating system, presented in an interactive HTML display.
+An interactive tool to browse and compare the default fonts across major operating systems.
 
-**[Show me the fonts!](https://rawcdn.githack.com/dcog989/Default-fonts-per-OS/82066fbac0aba7c0991e21f8ba11555e032c8675/index.html)**
+**[Live Demo](https://dcog989.github.io/Default-fonts-per-OS/)**
 
-The page provides two views which can be changed at the top of the page: a list view with sample text, and a more compact table view.
+## Features
 
-The fonts are stored in a JSON file so it's easy to add or update as needed.
-
-**Note: fonts not installed on your system are displayed in red monospace.**
+* **Multiple Views:** Switch between a detailed List view, a compact Table view, and a side-by-side Comparison mode.
+* **Live Preview:** Renders fonts directly from your system, with unavailable fonts highlighted for clarity.
+* **Customization:** Adjust font sizes and preview with your own custom text.
+* **Powerful Filtering:** Instantly search by font name and filter by category (e.g., serif, sans-serif, monospace).
+* **Comparison Tool:** Select fonts to compare, then copy them as a ready-to-use CSS `font-family` string.
+* **Web-Safe Indicators:** Quickly identify fonts common across multiple operating systems.
+* **Themes & Persistence:** Choose between Light, Dark, or Auto themes. All your settings are saved locally for your next visit.
 
 ## Operating Systems
 
-Windows 11, macOS (Sonoma), iOS (18), Android (15), Ubuntu (24.10).
+The list includes default fonts for: Windows 11, macOS Sonoma, iOS 17, Android, and Ubuntu.
 
 ## References
 
-- [Operating System Market Share Worldwide - January 2025 - Android 46%, Windows 25%, iOS 18%, macOS 5%, Linux 1.3%](https://gs.statcounter.com/os-market-share/all/)
+* [Operating System Market Share Worldwide - January 2025 - Android 46%, Windows 25%, iOS 18%, macOS 5%, Linux 1.3%](https://gs.statcounter.com/os-market-share/all/)
