@@ -1,7 +1,7 @@
-document.addEventListener('load', () => {
+window.addEventListener('load', () => {
 
     const App = {
-        elements: {}, // Initialized as empty
+        elements: {},
 
         state: {
             fontData: null,
@@ -50,7 +50,6 @@ document.addEventListener('load', () => {
             }
         },
 
-        // New method to cache DOM elements
         cacheElements() {
             this.elements = {
                 content: document.getElementById('content'),
