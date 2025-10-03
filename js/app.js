@@ -256,7 +256,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
     };
 
-    fetch('fonts.json')
+    fetch('./data/fonts.json')
         .then(response => { if (!response.ok) throw new Error(`Network response was not ok: ${response.statusText}`); return response.json(); })
         .then(fontData => App.init(fontData))
         .catch(error => { console.error('Error fetching or initializing app:', error); App.elements.content.innerHTML = '<p style="color:red;">Error loading font data. Please check fonts.json and the browser console for details.</p>'; });
