@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('load', () => {
 
     const App = {
         elements: {}, // Initialized as empty
@@ -50,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
 
+        // New method to cache DOM elements
         cacheElements() {
             this.elements = {
                 content: document.getElementById('content'),
@@ -74,14 +75,8 @@ document.addEventListener('DOMContentLoaded', () => {
             this.calculateWebSafeFonts();
             this.setupCategoryFilter();
             this.setupEventListeners();
-
-            // Defer loading preferences and the initial render to the next event loop cycle.
-            // This ensures the browser has finished rendering all child DOM elements (like
-            // the radio buttons) before we try to interact with them, fixing the race condition.
-            setTimeout(() => {
-                this.loadPreferences();
-                this.render();
-            }, 0);
+            this.loadPreferences();
+            this.render();
         },
 
         populateFontSizeSelector() {
