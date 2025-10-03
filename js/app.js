@@ -45,6 +45,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const dims = { width: span.offsetWidth, height: span.offsetHeight }; this.testContainer.removeChild(span); return dims;
             },
             isAvailable: function (font) {
+                // Lazy initialization: run init() only on the first check.
+                if (!this.testContainer) {
+                    this.init();
+                }
                 const fontLower = font.toLowerCase();
                 if (this.cache[fontLower] !== undefined) return this.cache[fontLower];
 
@@ -62,7 +66,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         init(fontData) {
             this.state.fontData = fontData;
-            this.fontChecker.init();
+            // The fontChecker is now initialized lazily, so we remove the explicit call from here
+            // to prevent forcing a layout too early.
+            // this.fontChecker.init();
             this.populateFontSizeSelector();
             this.calculateWebSafeFonts();
             this.setupCategoryFilter();
