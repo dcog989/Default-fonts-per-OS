@@ -1,5 +1,3 @@
-// The entire font data structure is now a constant inside this file.
-// This removes all external fetching and timing-related race conditions.
 const fontData = {
     "operatingSystems": [
         {
@@ -436,6 +434,5 @@ document.addEventListener('DOMContentLoaded', () => {
         },
     };
 
-    // The fetch logic is now gone. We initialize the app directly with the embedded constant.
     App.init(fontData);
 });
