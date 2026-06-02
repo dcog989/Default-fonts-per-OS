@@ -28,9 +28,6 @@ html.light-theme {
     --c-link: #0d47a1;
     --c-websafe: #388e3c;
 }
-html.light-theme h1 {
-    color: var(--c-accent);
-}
 
 html {
     scroll-behavior: smooth;
@@ -50,8 +47,17 @@ body {
 
 h1 {
     font-size: 36px;
-    text-align: center;
     color: var(--c-accent);
+    margin: 0;
+    text-align: center;
+    flex-grow: 1;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
 }
 
 h2 {
@@ -66,15 +72,14 @@ h2 {
     flex-direction: column;
     gap: 15px;
     margin: 0 auto 25px;
-    max-width: 1200px;
 }
 
 .controls {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 24px;
-    flex-wrap: wrap;
+    gap: 12px;
+    flex-wrap: nowrap;
 }
 
 .control-group {
@@ -125,9 +130,10 @@ input[type="text"] {
     color: var(--c-text);
     border: 1px solid var(--c-border);
     border-radius: 5px;
-    padding: 8px;
+    padding: 10px;
     font-family: inherit;
     font-size: 14px;
+    line-height: 1.4;
 }
 
 button {
@@ -155,10 +161,6 @@ button:disabled {
 }
 
 #theme-toggle {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 100;
     background: var(--c-control-bg);
     border: 1px solid var(--c-border);
     border-radius: 8px;
@@ -169,6 +171,7 @@ button:disabled {
     justify-content: center;
     color: var(--c-text);
     line-height: 0;
+    flex-shrink: 0;
     transition: background 0.2s, color 0.2s;
 }
 
