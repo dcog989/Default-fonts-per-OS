@@ -37,6 +37,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 		defaultPangram:
 			"Wilma Fox\u2019s lazy susan held quince jam, butter, pickles, olives, mustard, and vinegar. 1234567890.",
 
+		presets: {
+			"": "",
+			alphabet: "ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz",
+			chars: "0123456789 !@#$%^&*()_+-=[]{}|;':\",./<>?`",
+			lorem: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+		},
+
 		// Common fontconfig alias pairs (source → resolved alias on Linux)
 		fontconfigAliases: {
 			"Courier New": ["Liberation Mono", "FreeMono", "DejaVu Sans Mono", "Noto Sans Mono"],
@@ -154,6 +161,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 				backToTopButton: document.getElementById("back-to-top"),
 				clearAllButton: document.getElementById("clear-all-button"),
 				copySelectedButton: document.getElementById("copy-selected-button"),
+				presetSelector: document.getElementById("preset-selector"),
 			};
 		},
 
@@ -226,6 +234,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 			});
 			this.elements.customTextInput.addEventListener("input", (e) => {
 				this.state.filters.text = e.target.value;
+				this.elements.presetSelector.value = "";
+				this.render();
+			});
+			this.elements.presetSelector.addEventListener("change", (e) => {
+				const text = App.presets[e.target.value] ?? "";
+				this.state.filters.text = text;
+				this.elements.customTextInput.value = text;
+				this.saveFilters();
 				this.render();
 			});
 			this.elements.categorySelector.addEventListener("change", (e) => {
@@ -275,6 +291,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 			this.state.filters.text = "";
 			this.elements.searchInput.value = "";
 			this.elements.customTextInput.value = "";
+			this.elements.presetSelector.value = "";
 			this.elements.categorySelector.querySelector(
 				'input[value="all"]',
 			).checked = true;
@@ -479,6 +496,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 			if (savedFilters) {
 				this.state.filters = savedFilters;
 				this.elements.searchInput.value = savedFilters.search;
+				this.elements.customTextInput.value = savedFilters.text ?? "";
 				const categoryInput = this.elements.categorySelector.querySelector(
 					`input[value="${savedFilters.category}"]`,
 				);
