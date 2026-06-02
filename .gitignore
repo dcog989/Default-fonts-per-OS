@@ -1,6 +1,5 @@
-.ai-context
-.dev-notes
+.context
+.docs
 .git
-.vscode
 repomix.config.json
 .repomixignore
