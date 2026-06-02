@@ -193,8 +193,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.baseDims.mono = this.getDimensions('monospace');
             },
             getDimensions: function (font) {
-                const span = document.createElement("span"); span.style.fontFamily = font; span.textContent = this.testString; this.testContainer.appendChild(span);
-                const dims = { width: span.offsetWidth, height: span.offsetHeight }; this.testContainer.removeChild(span); return dims;
+                if (!this._el) {
+                    this._el = document.createElement("span");
+                    this._el.textContent = this.testString;
+                    this.testContainer.appendChild(this._el);
+                }
+                this._el.style.fontFamily = font;
+                return { width: this._el.offsetWidth, height: this._el.offsetHeight };
             },
             isAvailable: function (font) {
                 if (!this.testContainer) {
@@ -274,7 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.elements.themeSelector.addEventListener('change', (e) => this.applyTheme(e.target.value));
 
             this.elements.searchInput.addEventListener('input', e => { this.state.filters.search = e.target.value.toLowerCase(); this.saveFilters(); this.render(); });
-            this.elements.customTextInput.addEventListener('input', e => { this.state.filters.text = e.target.value; this.render(); });
+            this.elements.customTextInput.addEventListener('input', e => { this.state.filters.text = e.target.value; this.render(true); });
             this.elements.categorySelector.addEventListener('change', e => { this.state.filters.category = e.target.value; this.saveFilters(); this.render(); });
 
             this.elements.clearAllButton.addEventListener('click', () => this.clearAll());
@@ -322,13 +327,13 @@ document.addEventListener('DOMContentLoaded', () => {
             })).filter(os => os.fonts.length > 0);
         },
 
-        render() {
+        render(skipFontCheck = false) {
             const filteredData = this.applyFilters(this.state.fontData.operatingSystems);
             const view = this.elements.viewSelector.querySelector('input:checked').value;
             if (view === 'list') this.renderListView(filteredData);
             else if (view === 'table') this.renderTableView(filteredData);
             else if (view === 'compare') this.renderCompareView();
-            this.runFontAvailabilityChecks();
+            if (!skipFontCheck) this.runFontAvailabilityChecks();
         },
 
         createFontItemHTML(font, viewType) {
