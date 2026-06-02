@@ -299,7 +299,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // Clear filters
             this.state.filters.search = '';
             this.state.filters.category = 'all';
+            this.state.filters.text = '';
             this.elements.searchInput.value = '';
+            this.elements.customTextInput.value = '';
             this.elements.categorySelector.querySelector('input[value="all"]').checked = true;
             this.saveFilters();
 
@@ -398,6 +400,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => {
                     button.textContent = originalText;
                     button.style.minWidth = '';
+                }, 1500);
+            }).catch(() => {
+                const button = this.elements.copySelectedButton;
+                const originalText = button.textContent;
+                button.textContent = 'Failed';
+                setTimeout(() => {
+                    button.textContent = originalText;
                 }, 1500);
             });
         },
