@@ -151,6 +151,28 @@ button:disabled {
     cursor: not-allowed;
 }
 
+#theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+    background: var(--c-control-bg);
+    border: 1px solid var(--c-border);
+    border-radius: 8px;
+    padding: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--c-text);
+    line-height: 0;
+    transition: background 0.2s, color 0.2s;
+}
+
+#theme-toggle:hover {
+    background: var(--c-control-bg-active);
+}
+
 #custom-text-input {
     width: 300px;
     max-width: 100%;

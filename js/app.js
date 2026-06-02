@@ -165,6 +165,18 @@ const fontData = {
 
 document.addEventListener('DOMContentLoaded', () => {
 
+    const storage = {
+        get(key, fallback) {
+            try { const v = localStorage.getItem(key); return v !== null ? v : fallback; } catch { return fallback; }
+        },
+        set(key, value) {
+            try { localStorage.setItem(key, value); } catch { /* localStorage unavailable */ }
+        },
+        getJSON(key, fallback) {
+            try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; }
+        },
+    };
+
     const App = {
         elements: {},
 
@@ -175,7 +187,13 @@ document.addEventListener('DOMContentLoaded', () => {
             filters: { search: '', text: '', category: 'all' },
         },
 
-        defaultPangram: 'Wilma Fox’s lazy susan held quince jam, butter, pickles, olives, mustard, and vinegar. 1234567890.',
+        defaultPangram: 'Wilma Fox\u2019s lazy susan held quince jam, butter, pickles, olives, mustard, and vinegar. 1234567890.',
+
+        themeIcons: {
+            auto: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
+            light: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>',
+            dark: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
+        },
 
         fontChecker: {
             cache: {},
@@ -225,7 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 content: document.getElementById('content'),
                 viewSelector: document.getElementById('view-selector'),
                 fontSizeSelector: document.getElementById('font-size-selector'),
-                themeSelector: document.getElementById('theme-selector'),
+                themeToggle: document.getElementById('theme-toggle'),
                 searchInput: document.getElementById('search-input'),
                 customTextInput: document.getElementById('custom-text-input'),
                 categorySelector: document.getElementById('category-selector'),
@@ -276,7 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setupEventListeners() {
             this.elements.viewSelector.addEventListener('change', () => this.render());
             this.elements.fontSizeSelector.addEventListener('change', (e) => this.applyFontSize(e.target.value));
-            this.elements.themeSelector.addEventListener('change', (e) => this.applyTheme(e.target.value));
+            this.elements.themeToggle.addEventListener('click', () => this.cycleTheme());
 
             this.elements.searchInput.addEventListener('input', e => { this.state.filters.search = e.target.value.toLowerCase(); this.saveFilters(); this.render(); });
             this.elements.customTextInput.addEventListener('input', e => { this.state.filters.text = e.target.value; this.render(true); });
@@ -288,7 +306,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.addEventListener('scroll', () => this.elements.backToTopButton.classList.toggle('show', window.scrollY > 200));
             this.elements.backToTopButton.addEventListener('click', () => window.scrollTo(0, 0));
 
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if ((localStorage.getItem('theme') || 'auto') === 'auto') this.applyTheme('auto'); });
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (storage.get('theme', 'auto') === 'auto') this.applyTheme('auto'); });
 
             this.elements.content.addEventListener('change', (e) => {
                 if (e.target.matches('.compare-checkbox')) {
@@ -416,27 +434,34 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         },
 
-        applyFontSize(size) { document.documentElement.style.setProperty('--sample-font-size', `${size}px`); localStorage.setItem('fontSize', size); },
-        applyTheme(theme) { const osPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches; document.documentElement.classList.toggle('light-theme', theme === 'light' || (theme === 'auto' && !osPrefersDark)); localStorage.setItem('theme', theme); },
-        saveComparisonSet() { localStorage.setItem('comparisonSet', JSON.stringify(Array.from(this.state.comparisonSet))); },
-        saveFilters() { localStorage.setItem('filters', JSON.stringify(this.state.filters)); },
+        applyFontSize(size) { document.documentElement.style.setProperty('--sample-font-size', `${size}px`); storage.set('fontSize', size); },
+        applyTheme(theme) {
+            const osPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (theme === 'light' || (theme === 'auto' && !osPrefersDark)) {
+                document.documentElement.classList.add('light-theme');
+            } else {
+                document.documentElement.classList.remove('light-theme');
+            }
+            storage.set('theme', theme);
+            this.updateThemeIcon();
+        },
+        cycleTheme() { const order = ['auto', 'light', 'dark']; const current = storage.get('theme', 'auto'); const next = order[(order.indexOf(current) + 1) % order.length]; this.applyTheme(next); },
+        updateThemeIcon() { this.elements.themeToggle.innerHTML = this.themeIcons[storage.get('theme', 'auto')]; },
+        saveComparisonSet() { storage.set('comparisonSet', JSON.stringify(Array.from(this.state.comparisonSet))); },
+        saveFilters() { storage.set('filters', JSON.stringify(this.state.filters)); },
 
         loadPreferences() {
-            const savedTheme = localStorage.getItem('theme') || 'auto';
-            const themeInput = this.elements.themeSelector.querySelector(`input[value="${savedTheme}"]`);
-            if (themeInput) {
-                themeInput.checked = true;
-            }
+            const savedTheme = storage.get('theme', 'auto');
             this.applyTheme(savedTheme);
 
-            const savedFontSize = localStorage.getItem('fontSize') || '16';
+            const savedFontSize = storage.get('fontSize', '16');
             this.elements.fontSizeSelector.value = savedFontSize;
             document.documentElement.style.setProperty('--sample-font-size', `${savedFontSize}px`);
 
-            this.state.comparisonSet = new Set(JSON.parse(localStorage.getItem('comparisonSet') || '[]'));
+            this.state.comparisonSet = new Set(storage.getJSON('comparisonSet', []));
             this.updateCompareLabel();
 
-            const savedFilters = JSON.parse(localStorage.getItem('filters') || 'null');
+            const savedFilters = storage.getJSON('filters', null);
             if (savedFilters) {
                 this.state.filters = savedFilters;
                 this.elements.searchInput.value = savedFilters.search;
