@@ -35,13 +35,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 		},
 
 		defaultPangram:
-			"Wilma Fox\u2019s lazy susan held quince jam, butter, pickles, olives, mustard, and vinegar. 1234567890.",
+			"When zombies arrive, quickly fax Judge Pat. 1234567890.",
 
 		presets: {
 			"": "",
 			alphabet: "ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz",
 			chars: "0123456789 !@#$%^&*()_+-=[]{}|;':\",./<>?`",
-			lorem: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+			lorem: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
 		},
 
 		// Common fontconfig alias pairs (source → resolved alias on Linux)
@@ -238,10 +238,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 				this.render();
 			});
 			this.elements.presetSelector.addEventListener("change", (e) => {
-				const text = App.presets[e.target.value] ?? "";
-				this.state.filters.text = text;
-				this.elements.customTextInput.value = text;
-				this.saveFilters();
+				this.state.filters.text = App.presets[e.target.value] ?? "";
 				this.render();
 			});
 			this.elements.categorySelector.addEventListener("change", (e) => {
@@ -496,7 +493,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 			if (savedFilters) {
 				this.state.filters = savedFilters;
 				this.elements.searchInput.value = savedFilters.search;
-				this.elements.customTextInput.value = savedFilters.text ?? "";
 				const categoryInput = this.elements.categorySelector.querySelector(
 					`input[value="${savedFilters.category}"]`,
 				);
