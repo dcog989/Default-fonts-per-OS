@@ -1,0 +1,11 @@
+{
+    "name": "Android",
+    "fonts": [
+        { "name": "Arial", "category": "sans-serif" },
+        { "name": "Noto Color Emoji", "category": "symbol" },
+        { "name": "Noto Sans", "category": "sans-serif" },
+        { "name": "Noto Sans CJK JP", "category": "sans-serif" },
+        { "name": "Noto Serif", "category": "serif" },
+        { "name": "Roboto", "category": "sans-serif" }
+    ]
+}
