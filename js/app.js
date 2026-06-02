@@ -37,6 +37,28 @@ document.addEventListener("DOMContentLoaded", async () => {
 		defaultPangram:
 			"Wilma Fox\u2019s lazy susan held quince jam, butter, pickles, olives, mustard, and vinegar. 1234567890.",
 
+		// Common fontconfig alias pairs (source → resolved alias on Linux)
+		fontconfigAliases: {
+			"Courier New": ["Liberation Mono", "FreeMono", "DejaVu Sans Mono", "Noto Sans Mono"],
+			"Arial": ["Liberation Sans", "FreeSans", "DejaVu Sans", "Noto Sans"],
+			"Times New Roman": ["Liberation Serif", "FreeSerif", "DejaVu Serif", "Noto Serif"],
+			"Consolas": ["Liberation Mono", "DejaVu Sans Mono", "Noto Sans Mono"],
+			"Helvetica": ["Liberation Sans", "FreeSans", "Noto Sans"],
+			"Georgia": ["Liberation Serif", "FreeSerif", "Noto Serif"],
+			"Verdana": ["DejaVu Sans", "Liberation Sans", "Noto Sans"],
+		},
+
+		escapeCSS(str) {
+			return str.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+		},
+		escapeHTML(str) {
+			return str
+				.replace(/&/g, "&amp;")
+				.replace(/</g, "&lt;")
+				.replace(/>/g, "&gt;")
+				.replace(/"/g, "&quot;");
+		},
+
 		themeIcons: {
 			auto: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><title>Auto theme</title><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
 			light:
@@ -49,43 +71,70 @@ document.addEventListener("DOMContentLoaded", async () => {
 			testString: "mw_il",
 			testSize: "72px",
 			testContainer: null,
-			baseDims: {},
 			init: function () {
 				if (this.testContainer) return;
 				this.testContainer = document.createElement("div");
-				this.testContainer.style.cssText = `position:absolute; top:-9999px; left:-9999px; font-size:${this.testSize};`;
+				this.testContainer.style.cssText = "position:absolute;top:-9999px;left:-9999px;";
 				document.body.appendChild(this.testContainer);
-				this.baseDims.serif = this.getDimensions("serif");
-				this.baseDims.sans = this.getDimensions("sans-serif");
-				this.baseDims.mono = this.getDimensions("monospace");
 			},
-			getDimensions: function (font) {
-				if (!this._el) {
-					this._el = document.createElement("span");
-					this._el.textContent = this.testString;
-					this.testContainer.appendChild(this._el);
-				}
-				this._el.style.fontFamily = font;
-				return { width: this._el.offsetWidth, height: this._el.offsetHeight };
+			measureWidth(font) {
+				const el = document.createElement("span");
+				el.textContent = this.testString;
+				el.style.fontSize = this.testSize;
+				el.style.fontFamily = font;
+				this.testContainer.appendChild(el);
+				const w = el.offsetWidth;
+				this.testContainer.removeChild(el);
+				return w;
 			},
+
 			isAvailable: function (font) {
-				if (!this.testContainer) {
-					this.init();
-				}
 				const fontLower = font.toLowerCase();
 				if (this.cache[fontLower] !== undefined) return this.cache[fontLower];
 
-				const serifTest = this.getDimensions(`"${font}", serif`);
-				const sansTest = this.getDimensions(`"${font}", sans-serif`);
+				this.init();
 
-				const isDifferentFromSerif =
-					serifTest.width !== this.baseDims.serif.width ||
-					serifTest.height !== this.baseDims.serif.height;
-				const isDifferentFromSans =
-					sansTest.width !== this.baseDims.sans.width ||
-					sansTest.height !== this.baseDims.sans.height;
+				const generics = ["serif", "sans-serif", "monospace"];
+				let differs = 0;
 
-				const isAvailable = isDifferentFromSerif || isDifferentFromSans;
+				for (const generic of generics) {
+					const testEl = document.createElement("span");
+					const baseEl = document.createElement("span");
+					testEl.textContent = baseEl.textContent = this.testString;
+					testEl.style.fontSize = baseEl.style.fontSize = this.testSize;
+					testEl.style.fontFamily = `"${font}", ${generic}`;
+					baseEl.style.fontFamily = generic;
+
+					this.testContainer.appendChild(testEl);
+					this.testContainer.appendChild(baseEl);
+
+					if (testEl.offsetWidth !== baseEl.offsetWidth ||
+						testEl.offsetHeight !== baseEl.offsetHeight) {
+						differs++;
+					}
+
+					this.testContainer.removeChild(testEl);
+					this.testContainer.removeChild(baseEl);
+				}
+
+				let isAvailable = differs >= 2;
+
+				// De-alias: if the font looks available, check it isn't just a
+				// fontconfig alias by comparing against known common alias targets.
+				// If it renders identically to an alias target, it's not truly installed.
+				if (isAvailable) {
+					const candidates = App.fontconfigAliases[font];
+					if (candidates) {
+						const wTarget = this.measureWidth(`"${font}", serif`);
+						for (const alias of candidates) {
+							if (wTarget === this.measureWidth(`"${alias}", serif`)) {
+								isAvailable = false;
+								break;
+							}
+						}
+					}
+				}
+
 				this.cache[fontLower] = isAvailable;
 				return isAvailable;
 			},
@@ -177,7 +226,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 			});
 			this.elements.customTextInput.addEventListener("input", (e) => {
 				this.state.filters.text = e.target.value;
-				this.render(true);
+				this.render();
 			});
 			this.elements.categorySelector.addEventListener("change", (e) => {
 				this.state.filters.category = e.target.value;
@@ -270,17 +319,19 @@ document.addEventListener("DOMContentLoaded", async () => {
 			const isChecked = this.state.comparisonSet.has(font.name)
 				? "checked"
 				: "";
+			const safeName = this.escapeHTML(font.name);
+			const cssName = this.escapeCSS(font.name);
 			const webSafeIndicator = this.state.webSafeFonts.has(font.name)
 				? `<span class="web-safe-indicator" title="Web-safe (found on 3+ OSes)"></span>`
 				: "";
-			const checkboxHTML = `<input type="checkbox" class="compare-checkbox" data-font-name="${font.name}" ${isChecked}>`;
+			const checkboxHTML = `<input type="checkbox" class="compare-checkbox" data-font-name="${safeName}" ${isChecked}>`;
 			const textToShow = this.state.filters.text || this.defaultPangram;
 
 			if (viewType !== "table") {
-				return `<div class="font-item-wrapper">${checkboxHTML}<p class="font-display-item" style="font-family: '${font.name}'" data-font-name="${font.name}"><span class="font-name">${font.name}${webSafeIndicator}</span> ${textToShow}</p></div>`;
+				return `<div class="font-item-wrapper">${checkboxHTML}<p class="font-display-item" style="font-family: '${cssName}'" data-font-name="${safeName}"><span class="font-name">${safeName}${webSafeIndicator}</span> ${textToShow}</p></div>`;
 			}
 			if (viewType === "table") {
-				return `<div class="font-item-wrapper">${checkboxHTML}<span class="font-display-item" style="font-family: '${font.name}'" data-font-name="${font.name}">${font.name}${webSafeIndicator}</span></div>`;
+				return `<div class="font-item-wrapper">${checkboxHTML}<span class="font-display-item" style="font-family: '${cssName}'" data-font-name="${safeName}">${safeName}${webSafeIndicator}</span></div>`;
 			}
 			return "";
 		},
@@ -439,9 +490,19 @@ document.addEventListener("DOMContentLoaded", async () => {
 	};
 
 	const files = ["windows-11", "macos-tahoe", "ios-26", "android", "linux-gnome", "linux-kde-plasma", "linux-xfce", "linux-cinnamon"];
-	const responses = await Promise.all(
-		files.map((f) => fetch(`data/${f}.json`)),
-	);
-	const operatingSystems = await Promise.all(responses.map((r) => r.json()));
+	let operatingSystems;
+	try {
+		const responses = await Promise.all(
+			files.map((f) => fetch(`data/${f}.json`).then((r) => {
+				if (!r.ok) throw new Error(`Failed to load ${f}.json (${r.status})`);
+				return r;
+			})),
+		);
+		operatingSystems = await Promise.all(responses.map((r) => r.json()));
+	} catch (err) {
+		document.getElementById("content").innerHTML =
+			`<p>Failed to load font data: ${err.message}</p>`;
+		return;
+	}
 	App.init({ operatingSystems });
 });
