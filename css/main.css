@@ -190,7 +190,7 @@ button:disabled {
 }
 
 .list-view .font-display-item {
-    margin-bottom: 15px;
+    margin-bottom: 5px;
     padding: 8px 12px;
     border-radius: 4px;
     flex-grow: 1;
