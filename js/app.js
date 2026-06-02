@@ -32,6 +32,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 			webSafeFonts: new Set(),
 			comparisonSet: new Set(),
 			filters: { search: "", text: "", category: "all" },
+			collapsed: null,
 		},
 
 		defaultPangram:
@@ -279,6 +280,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 					this.saveComparisonSet();
 				}
 			});
+
+			this.elements.content.addEventListener("dragstart", (e) => this.onDragStart(e));
+			this.elements.content.addEventListener("dragover", (e) => this.onDragOver(e));
+			this.elements.content.addEventListener("drop", (e) => this.onDrop(e));
+			this.elements.content.addEventListener("dragend", (e) => this.onDragEnd(e));
+			this.elements.content.addEventListener("click", (e) => this.onCollapseClick(e));
 		},
 
 		clearAll() {
@@ -355,9 +362,90 @@ document.addEventListener("DOMContentLoaded", async () => {
 			this.elements.content.innerHTML = data
 				.map(
 					(os) =>
-						`<div class="os-set"><h2>${os.name} (${os.fonts.length})</h2>${os.fonts.map((font) => this.createFontItemHTML(font, "list")).join("")}</div>`,
+						`<div class="os-set" draggable="true" data-os-name="${this.escapeHTML(os.name)}"><div class="os-set-header">${this.renderCollapseIcon(os.name)}<h2>${os.name} (${os.fonts.length})</h2></div>${os.fonts.map((font) => this.createFontItemHTML(font, "list")).join("")}</div>`,
 				)
 				.join("");
+			this.restoreCollapsedStates();
+		},
+
+		// --- Drag & Drop ---
+		dragSrc: null,
+		onDragStart(e) {
+			const set = e.target.closest(".os-set");
+			if (!set) return;
+			this.dragSrc = set;
+			set.classList.add("dragging");
+			e.dataTransfer.effectAllowed = "move";
+			e.dataTransfer.setData("text/plain", "");
+		},
+		onDragOver(e) {
+			if (!this.dragSrc) return;
+			e.preventDefault();
+			const target = e.target.closest(".os-set");
+			if (!target || target === this.dragSrc) return;
+			const rect = target.getBoundingClientRect();
+			const midY = rect.top + rect.height / 2;
+			if (e.clientY < midY) {
+				target.parentNode.insertBefore(this.dragSrc, target);
+			} else {
+				target.parentNode.insertBefore(this.dragSrc, target.nextSibling);
+			}
+		},
+		onDrop(e) {
+			e.preventDefault();
+		},
+		onDragEnd() {
+			if (this.dragSrc) this.dragSrc.classList.remove("dragging");
+			this.dragSrc = null;
+			// Persist the new order
+			this.persistOrder();
+		},
+
+		persistOrder() {
+			const domOrder = [...this.elements.content.querySelectorAll(".os-set")].map(
+				(el) => el.dataset.osName,
+			);
+
+			if (!this.state.fontData) return;
+			const map = {};
+			this.state.fontData.operatingSystems.forEach((os) => { map[os.name] = os; });
+			const reordered = domOrder.map((name) => map[name]).filter(Boolean);
+			const remaining = this.state.fontData.operatingSystems.filter(
+				(os) => !domOrder.includes(os.name),
+			);
+			this.state.fontData.operatingSystems = reordered.concat(remaining);
+
+			// Save from data array (source of truth after reorder)
+			const finalOrder = this.state.fontData.operatingSystems.map((os) => os.name);
+			try { localStorage.setItem("osOrder", JSON.stringify(finalOrder)); } catch {}
+		},
+
+		// --- Collapse ---
+		renderCollapseIcon(osName) {
+			const collapsed = this.state.collapsed?.[osName];
+			return `<span class="collapse-toggle" style="transform: rotate(${collapsed ? 0 : 180}deg)"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 20 5-5 5 5"/><path d="m7 4 5 5 5-5"/></svg></span>`;
+		},
+
+		restoreCollapsedStates() {
+			if (!this.state.collapsed) return;
+			this.elements.content.querySelectorAll(".os-set").forEach((set) => {
+				const name = set.dataset.osName;
+				if (this.state.collapsed[name]) {
+					set.classList.add("collapsed");
+				}
+			});
+		},
+
+		onCollapseClick(e) {
+			const toggle = e.target.closest(".collapse-toggle");
+			if (!toggle) return;
+			const set = toggle.closest(".os-set");
+			if (!set) return;
+			const name = set.dataset.osName;
+			set.classList.toggle("collapsed");
+			if (!this.state.collapsed) this.state.collapsed = {};
+			this.state.collapsed[name] = set.classList.contains("collapsed");
+			storage.set("collapsed", JSON.stringify(this.state.collapsed));
 		},
 
 		renderTableView(data) {
@@ -500,6 +588,32 @@ document.addEventListener("DOMContentLoaded", async () => {
 					categoryInput.checked = true;
 				}
 			}
+
+			this.state.collapsed = storage.getJSON("collapsed", null);
+
+			this.restoreOsOrder();
+		},
+
+		restoreOsOrder() {
+			const raw = localStorage.getItem("osOrder");
+			if (!raw) return;
+			let savedOrder;
+			try {
+				savedOrder = JSON.parse(raw);
+			} catch {
+				return;
+			}
+			if (!savedOrder || !Array.isArray(savedOrder) || !this.state.fontData) return;
+
+			const map = {};
+			this.state.fontData.operatingSystems.forEach((os) => { map[os.name] = os; });
+			const reordered = savedOrder
+				.map((name) => map[name])
+				.filter(Boolean);
+			const remaining = this.state.fontData.operatingSystems.filter(
+				(os) => !savedOrder.includes(os.name),
+			);
+			this.state.fontData.operatingSystems = reordered.concat(remaining);
 		},
 	};
 
