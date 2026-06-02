@@ -438,7 +438,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 		},
 	};
 
-	const files = ["windows-11", "macos-sonoma", "ios-17", "android", "ubuntu"];
+	const files = ["windows-11", "macos-sonoma", "ios-17", "android", "linux-gnome", "linux-kde-plasma", "linux-xfce", "linux-cinnamon"];
 	const responses = await Promise.all(
 		files.map((f) => fetch(`data/${f}.json`)),
 	);

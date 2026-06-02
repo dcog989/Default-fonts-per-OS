@@ -1,0 +1,16 @@
+{
+    "name": "Linux (KDE Plasma)",
+    "fonts": [
+        { "name": "DejaVu Sans", "category": "sans-serif" },
+        { "name": "DejaVu Sans Mono", "category": "monospace" },
+        { "name": "DejaVu Serif", "category": "serif" },
+        { "name": "Hack", "category": "monospace" },
+        { "name": "Liberation Mono", "category": "monospace" },
+        { "name": "Liberation Sans", "category": "sans-serif" },
+        { "name": "Liberation Serif", "category": "serif" },
+        { "name": "Noto Color Emoji", "category": "symbol" },
+        { "name": "Noto Sans", "category": "sans-serif" },
+        { "name": "Noto Sans Mono", "category": "monospace" },
+        { "name": "Noto Serif", "category": "serif" }
+    ]
+}
