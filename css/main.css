@@ -29,7 +29,7 @@ html.light-theme {
     --c-websafe: #388e3c;
 }
 html.light-theme h1 {
-    color: #2da880;
+    color: var(--c-accent);
 }
 
 html {
@@ -153,6 +153,7 @@ button:disabled {
 
 #custom-text-input {
     width: 300px;
+    max-width: 100%;
 }
 
 .font-item-wrapper {
@@ -189,9 +190,8 @@ button:disabled {
 }
 
 .font-comparison-table {
-    margin: 0 auto;
+    margin: 0 auto 20px;
     border-collapse: collapse;
-    margin-bottom: 20px;
     width: 100%;
 }
 
