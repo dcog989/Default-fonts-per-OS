@@ -130,10 +130,9 @@ input[type="text"] {
     color: var(--c-text);
     border: 1px solid var(--c-border);
     border-radius: 5px;
-    padding: 10px;
+    padding: 8px;
     font-family: inherit;
     font-size: 14px;
-    line-height: 1.4;
 }
 
 button {
