@@ -355,7 +355,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 			this.elements.content.innerHTML = data
 				.map(
 					(os) =>
-						`<h2>${os.name} (${os.fonts.length})</h2>${os.fonts.map((font) => this.createFontItemHTML(font, "list")).join("")}`,
+						`<div class="os-set"><h2>${os.name} (${os.fonts.length})</h2>${os.fonts.map((font) => this.createFontItemHTML(font, "list")).join("")}</div>`,
 				)
 				.join("");
 		},
@@ -371,7 +371,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 		},
 
 		renderCompareView() {
-			this.elements.content.className = "list-view";
+			this.elements.content.className = "compare-view";
 			if (this.state.comparisonSet.size === 0) {
 				this.elements.content.innerHTML =
 					"<p>Select fonts to compare by clicking the checkbox next to their name in List or Table view.</p>";

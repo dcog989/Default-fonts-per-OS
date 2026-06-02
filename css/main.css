@@ -41,9 +41,10 @@ body {
     color: var(--c-text);
     font-family: "Source Code Pro", Consolas, "Courier New", Courier, monospace;
     font-size: var(--font-size-base);
-    margin: 20px auto 40px;
-    width: 1400px;
-    max-width: 95%;
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+    box-sizing: border-box;
     transition: background 0.6s ease, color 0.6s ease;
 }
 
@@ -54,16 +55,18 @@ h1 {
 }
 
 h2 {
-    margin-top: 30px;
+    margin: 0 0 10px;
     border-bottom: 1px solid var(--c-border);
     padding-bottom: 5px;
+    font-size: 18px;
 }
 
 .controls-container {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    margin-bottom: 25px;
+    margin: 0 auto 25px;
+    max-width: 1200px;
 }
 
 .controls {
@@ -196,7 +199,36 @@ button:disabled {
     flex-grow: 1;
 }
 
+.list-view {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+    gap: 20px;
+    align-items: start;
+}
+
+.list-view .os-set {
+    background: var(--c-header-bg);
+    border-radius: 6px;
+    padding: 12px;
+}
+
 .list-view .font-name {
+    background-color: var(--c-header-bg);
+    display: inline-block;
+    margin-right: 10px;
+    padding: 4px 8px;
+    width: 260px;
+    border-radius: 3px;
+    font-size: var(--sample-font-size);
+    vertical-align: middle;
+}
+
+.compare-view {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.compare-view .font-name {
     background-color: var(--c-header-bg);
     display: inline-block;
     margin-right: 10px;
@@ -209,6 +241,11 @@ button:disabled {
 
 .table-view {
     text-align: center;
+    overflow-x: auto;
+}
+
+.table-view table {
+    min-width: 600px;
 }
 
 .font-comparison-table {
@@ -230,11 +267,13 @@ button:disabled {
     background-color: var(--c-header-bg);
     font-size: 20px;
     font-weight: bold;
+    white-space: nowrap;
 }
 
 .font-comparison-table .font-display-item {
     display: block;
     padding: 5px;
+    white-space: nowrap;
 }
 
 .font-item-wrapper.font-unavailable .font-display-item {
