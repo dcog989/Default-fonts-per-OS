@@ -22,6 +22,8 @@ The list includes default fonts for: Windows 11, macOS Sonoma, iOS 17, Android, 
 
 ```text
 python -m http.server
+# or
+bunx http-server
 ```
 
 ## References
