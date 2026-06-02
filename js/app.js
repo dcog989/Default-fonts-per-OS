@@ -342,7 +342,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const checkboxHTML = `<input type="checkbox" class="compare-checkbox" data-font-name="${font.name}" ${isChecked}>`;
             const textToShow = this.state.filters.text || this.defaultPangram;
 
-            if (viewType === 'list' || viewType === 'compare') {
+            if (viewType !== 'table') {
                 return `<div class="font-item-wrapper">${checkboxHTML}<p class="font-display-item" style="font-family: '${font.name}'" data-font-name="${font.name}"><span class="font-name">${font.name}${webSafeIndicator}</span> ${textToShow}</p></div>`;
             }
             if (viewType === 'table') {
@@ -431,7 +431,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const savedFontSize = localStorage.getItem('fontSize') || '16';
             this.elements.fontSizeSelector.value = savedFontSize;
-            this.applyFontSize(savedFontSize);
+            document.documentElement.style.setProperty('--sample-font-size', `${savedFontSize}px`);
 
             this.state.comparisonSet = new Set(JSON.parse(localStorage.getItem('comparisonSet') || '[]'));
             this.updateCompareLabel();

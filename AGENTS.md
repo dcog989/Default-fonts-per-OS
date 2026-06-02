@@ -24,12 +24,9 @@ All unless excluded below.
 
 ## Development Notes
 
-This project leverages modern web APIs and the latest Svelte features. Key considerations:
+This project leverages modern web APIs. Key considerations:
 
-1. **Svelte 5 Runes** - Uses the new reactivity system instead of stores
-2. **Tailwind v4** - Latest version with Vite plugin
-3. **Web Workers** - Offloads heavy computation to prevent UI blocking
-4. **OKLCH Color Space** - Modern, perceptually uniform alternative to HSL/RGB
+1. **Web Workers** - Offloads heavy computation to prevent UI blocking
 
 ## Future Enhancement Ideas
 
