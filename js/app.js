@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 					sansTest.width !== this.baseDims.sans.width ||
 					sansTest.height !== this.baseDims.sans.height;
 
-				const isAvailable = isDifferentFromSerif && isDifferentFromSans;
+				const isAvailable = isDifferentFromSerif || isDifferentFromSans;
 				this.cache[fontLower] = isAvailable;
 				return isAvailable;
 			},
