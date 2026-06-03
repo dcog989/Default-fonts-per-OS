@@ -3,3 +3,4 @@
 .git
 repomix.config.json
 .repomixignore
+test-results/

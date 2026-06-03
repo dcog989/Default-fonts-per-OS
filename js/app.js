@@ -1,29 +1,13 @@
-document.addEventListener("DOMContentLoaded", async () => {
-	const storage = {
-		get(key, fallback) {
-			try {
-				const v = localStorage.getItem(key);
-				return v !== null ? v : fallback;
-			} catch {
-				return fallback;
-			}
-		},
-		set(key, value) {
-			try {
-				localStorage.setItem(key, value);
-			} catch {
-				/* localStorage unavailable */
-			}
-		},
-		getJSON(key, fallback) {
-			try {
-				return JSON.parse(localStorage.getItem(key)) ?? fallback;
-			} catch {
-				return fallback;
-			}
-		},
-	};
+import { storage } from './storage.js';
+import { presets, themeIcons } from './constants.js';
+import {
+	renderListView,
+	renderTableView,
+	renderCompareView,
+	runFontAvailabilityChecks,
+} from './renderer.js';
 
+document.addEventListener("DOMContentLoaded", async () => {
 	const App = {
 		elements: {},
 
@@ -33,119 +17,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 			comparisonSet: new Set(),
 			filters: { search: "", text: "", category: "all" },
 			collapsed: null,
-		},
-
-		defaultPangram:
-			"When zombies arrive, quickly fax Judge Pat. 1234567890.",
-
-		presets: {
-			"": "",
-			alphabet: "ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz",
-			chars: "0123456789 !@#$%^&*()_+-=[]{}|;':\",./<>?`",
-			lorem: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-		},
-
-		// Common fontconfig alias pairs (source → resolved alias on Linux)
-		fontconfigAliases: {
-			"Courier New": ["Liberation Mono", "FreeMono", "DejaVu Sans Mono", "Noto Sans Mono"],
-			"Arial": ["Liberation Sans", "FreeSans", "DejaVu Sans", "Noto Sans"],
-			"Times New Roman": ["Liberation Serif", "FreeSerif", "DejaVu Serif", "Noto Serif"],
-			"Consolas": ["Liberation Mono", "DejaVu Sans Mono", "Noto Sans Mono"],
-			"Helvetica": ["Liberation Sans", "FreeSans", "Noto Sans"],
-			"Georgia": ["Liberation Serif", "FreeSerif", "Noto Serif"],
-			"Verdana": ["DejaVu Sans", "Liberation Sans", "Noto Sans"],
-		},
-
-		escapeCSS(str) {
-			return str.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
-		},
-		escapeHTML(str) {
-			return str
-				.replace(/&/g, "&amp;")
-				.replace(/</g, "&lt;")
-				.replace(/>/g, "&gt;")
-				.replace(/"/g, "&quot;");
-		},
-
-		themeIcons: {
-			auto: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><title>Auto theme</title><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
-			light:
-				'<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><title>Light theme</title><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>',
-			dark: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><title>Dark theme</title><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
-		},
-
-		fontChecker: {
-			cache: {},
-			testString: "mw_il",
-			testSize: "72px",
-			testContainer: null,
-			init: function () {
-				if (this.testContainer) return;
-				this.testContainer = document.createElement("div");
-				this.testContainer.style.cssText = "position:absolute;top:-9999px;left:-9999px;";
-				document.body.appendChild(this.testContainer);
-			},
-			measureWidth(font) {
-				const el = document.createElement("span");
-				el.textContent = this.testString;
-				el.style.fontSize = this.testSize;
-				el.style.fontFamily = font;
-				this.testContainer.appendChild(el);
-				const w = el.offsetWidth;
-				this.testContainer.removeChild(el);
-				return w;
-			},
-
-			isAvailable: function (font) {
-				const fontLower = font.toLowerCase();
-				if (this.cache[fontLower] !== undefined) return this.cache[fontLower];
-
-				this.init();
-
-				const generics = ["serif", "sans-serif", "monospace"];
-				let differs = 0;
-
-				for (const generic of generics) {
-					const testEl = document.createElement("span");
-					const baseEl = document.createElement("span");
-					testEl.textContent = baseEl.textContent = this.testString;
-					testEl.style.fontSize = baseEl.style.fontSize = this.testSize;
-					testEl.style.fontFamily = `"${font}", ${generic}`;
-					baseEl.style.fontFamily = generic;
-
-					this.testContainer.appendChild(testEl);
-					this.testContainer.appendChild(baseEl);
-
-					if (testEl.offsetWidth !== baseEl.offsetWidth ||
-						testEl.offsetHeight !== baseEl.offsetHeight) {
-						differs++;
-					}
-
-					this.testContainer.removeChild(testEl);
-					this.testContainer.removeChild(baseEl);
-				}
-
-				let isAvailable = differs >= 2;
-
-				// De-alias: if the font looks available, check it isn't just a
-				// fontconfig alias by comparing against known common alias targets.
-				// If it renders identically to an alias target, it's not truly installed.
-				if (isAvailable) {
-					const candidates = App.fontconfigAliases[font];
-					if (candidates) {
-						const wTarget = this.measureWidth(`"${font}", serif`);
-						for (const alias of candidates) {
-							if (wTarget === this.measureWidth(`"${alias}", serif`)) {
-								isAvailable = false;
-								break;
-							}
-						}
-					}
-				}
-
-				this.cache[fontLower] = isAvailable;
-				return isAvailable;
-			},
 		},
 
 		cacheElements() {
@@ -209,9 +80,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 				.sort()
 				.map(
 					(cat) => `
-                <input type="radio" id="cat-${cat}" name="category" value="${cat}">
-                <label for="cat-${cat}">${cat.charAt(0).toUpperCase() + cat.slice(1)}</label>
-            `,
+				<input type="radio" id="cat-${cat}" name="category" value="${cat}">
+				<label for="cat-${cat}">${cat.charAt(0).toUpperCase() + cat.slice(1)}</label>
+			`,
 				)
 				.join("");
 			this.elements.categoryControls.style.display = "flex";
@@ -239,7 +110,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 				this.render();
 			});
 			this.elements.presetSelector.addEventListener("change", (e) => {
-				this.state.filters.text = App.presets[e.target.value] ?? "";
+				this.state.filters.text = presets[e.target.value] ?? "";
 				this.render();
 			});
 			this.elements.categorySelector.addEventListener("change", (e) => {
@@ -268,7 +139,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 			window
 				.matchMedia("(prefers-color-scheme: dark)")
 				.addEventListener("change", () => {
-					if (storage.get("theme", "auto") === "auto") this.applyTheme("auto");
+					if (storage.get("theme", "auto") === "auto")
+						this.applyTheme("auto");
 				});
 
 			this.elements.content.addEventListener("change", (e) => {
@@ -281,15 +153,22 @@ document.addEventListener("DOMContentLoaded", async () => {
 				}
 			});
 
-			this.elements.content.addEventListener("dragstart", (e) => this.onDragStart(e));
-			this.elements.content.addEventListener("dragover", (e) => this.onDragOver(e));
+			this.elements.content.addEventListener("dragstart", (e) =>
+				this.onDragStart(e),
+			);
+			this.elements.content.addEventListener("dragover", (e) =>
+				this.onDragOver(e),
+			);
 			this.elements.content.addEventListener("drop", (e) => this.onDrop(e));
-			this.elements.content.addEventListener("dragend", (e) => this.onDragEnd(e));
-			this.elements.content.addEventListener("click", (e) => this.onCollapseClick(e));
+			this.elements.content.addEventListener("dragend", (e) =>
+				this.onDragEnd(e),
+			);
+			this.elements.content.addEventListener("click", (e) =>
+				this.onCollapseClick(e),
+			);
 		},
 
 		clearAll() {
-			// Clear filters
 			this.state.filters.search = "";
 			this.state.filters.category = "all";
 			this.state.filters.text = "";
@@ -301,12 +180,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 			).checked = true;
 			this.saveFilters();
 
-			// Clear comparison set
 			this.state.comparisonSet.clear();
 			this.saveComparisonSet();
 			this.updateCompareLabel();
 
-			// Re-render everything
 			this.render();
 		},
 
@@ -330,42 +207,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 			);
 			const view =
 				this.elements.viewSelector.querySelector("input:checked").value;
-			if (view === "list") this.renderListView(filteredData);
-			else if (view === "table") this.renderTableView(filteredData);
-			else if (view === "compare") this.renderCompareView();
-			if (!skipFontCheck) this.runFontAvailabilityChecks();
-		},
-
-		createFontItemHTML(font, viewType) {
-			const isChecked = this.state.comparisonSet.has(font.name)
-				? "checked"
-				: "";
-			const safeName = this.escapeHTML(font.name);
-			const cssName = this.escapeCSS(font.name);
-			const webSafeIndicator = this.state.webSafeFonts.has(font.name)
-				? `<span class="web-safe-indicator" title="Web-safe (found on 3+ OSes)"></span>`
-				: "";
-			const checkboxHTML = `<input type="checkbox" class="compare-checkbox" data-font-name="${safeName}" ${isChecked}>`;
-			const textToShow = this.state.filters.text || this.defaultPangram;
-
-			if (viewType !== "table") {
-				return `<div class="font-item-wrapper">${checkboxHTML}<p class="font-display-item" style="font-family: '${cssName}'" data-font-name="${safeName}"><span class="font-name">${safeName}${webSafeIndicator}</span> ${textToShow}</p></div>`;
-			}
-			if (viewType === "table") {
-				return `<div class="font-item-wrapper">${checkboxHTML}<span class="font-display-item" style="font-family: '${cssName}'" data-font-name="${safeName}">${safeName}${webSafeIndicator}</span></div>`;
-			}
-			return "";
-		},
-
-		renderListView(data) {
-			this.elements.content.className = "list-view";
-			this.elements.content.innerHTML = data
-				.map(
-					(os) =>
-						`<div class="os-set" draggable="true" data-os-name="${this.escapeHTML(os.name)}"><div class="os-set-header">${this.renderCollapseIcon(os.name)}<h2>${os.name} (${os.fonts.length})</h2></div>${os.fonts.map((font) => this.createFontItemHTML(font, "list")).join("")}</div>`,
-				)
-				.join("");
-			this.restoreCollapsedStates();
+			if (view === "list") renderListView(this, filteredData);
+			else if (view === "table") renderTableView(this, filteredData);
+			else if (view === "compare") renderCompareView(this);
+			if (!skipFontCheck) runFontAvailabilityChecks(this);
 		},
 
 		// --- Drag & Drop ---
@@ -397,45 +242,32 @@ document.addEventListener("DOMContentLoaded", async () => {
 		onDragEnd() {
 			if (this.dragSrc) this.dragSrc.classList.remove("dragging");
 			this.dragSrc = null;
-			// Persist the new order
 			this.persistOrder();
 		},
 
 		persistOrder() {
-			const domOrder = [...this.elements.content.querySelectorAll(".os-set")].map(
-				(el) => el.dataset.osName,
-			);
+			const domOrder = [
+				...this.elements.content.querySelectorAll(".os-set"),
+			].map((el) => el.dataset.osName);
 
 			if (!this.state.fontData) return;
 			const map = {};
-			this.state.fontData.operatingSystems.forEach((os) => { map[os.name] = os; });
+			this.state.fontData.operatingSystems.forEach((os) => {
+				map[os.name] = os;
+			});
 			const reordered = domOrder.map((name) => map[name]).filter(Boolean);
 			const remaining = this.state.fontData.operatingSystems.filter(
 				(os) => !domOrder.includes(os.name),
 			);
 			this.state.fontData.operatingSystems = reordered.concat(remaining);
 
-			// Save from data array (source of truth after reorder)
-			const finalOrder = this.state.fontData.operatingSystems.map((os) => os.name);
-			try { localStorage.setItem("osOrder", JSON.stringify(finalOrder)); } catch {}
+			const finalOrder = this.state.fontData.operatingSystems.map(
+				(os) => os.name,
+			);
+			storage.set("osOrder", JSON.stringify(finalOrder));
 		},
 
 		// --- Collapse ---
-		renderCollapseIcon(osName) {
-			const collapsed = this.state.collapsed?.[osName];
-			return `<span class="collapse-toggle" style="transform: rotate(${collapsed ? 0 : 180}deg)"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 20 5-5 5 5"/><path d="m7 4 5 5 5-5"/></svg></span>`;
-		},
-
-		restoreCollapsedStates() {
-			if (!this.state.collapsed) return;
-			this.elements.content.querySelectorAll(".os-set").forEach((set) => {
-				const name = set.dataset.osName;
-				if (this.state.collapsed[name]) {
-					set.classList.add("collapsed");
-				}
-			});
-		},
-
 		onCollapseClick(e) {
 			const toggle = e.target.closest(".collapse-toggle");
 			if (!toggle) return;
@@ -446,47 +278,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 			if (!this.state.collapsed) this.state.collapsed = {};
 			this.state.collapsed[name] = set.classList.contains("collapsed");
 			storage.set("collapsed", JSON.stringify(this.state.collapsed));
-		},
-
-		renderTableView(data) {
-			this.elements.content.className = "table-view";
-			const maxRows = Math.max(0, ...data.map((os) => os.fonts.length));
-			let tableBodyHTML = "";
-			for (let i = 0; i < maxRows; i++) {
-				tableBodyHTML += `<tr>${data.map((os) => `<td>${i < os.fonts.length ? this.createFontItemHTML(os.fonts[i], "table") : ""}</td>`).join("")}</tr>`;
-			}
-			this.elements.content.innerHTML = `<table class="font-comparison-table"><thead><tr>${data.map((os) => `<th>${os.name} (${os.fonts.length})</th>`).join("")}</tr></thead><tbody>${tableBodyHTML}</tbody></table>`;
-		},
-
-		renderCompareView() {
-			this.elements.content.className = "compare-view";
-			if (this.state.comparisonSet.size === 0) {
-				this.elements.content.innerHTML =
-					"<p>Select fonts to compare by clicking the checkbox next to their name in List or Table view.</p>";
-				return;
-			}
-			const allFonts = this.state.fontData.operatingSystems.flatMap(
-				(os) => os.fonts,
-			);
-			const fontsToCompare = [
-				...new Map(allFonts.map((f) => [f.name, f])).values(),
-			].filter((font) => this.state.comparisonSet.has(font.name));
-			this.elements.content.innerHTML = `<h2>Comparison (${fontsToCompare.length})</h2>${fontsToCompare.map((font) => this.createFontItemHTML(font, "compare")).join("")}`;
-		},
-
-		runFontAvailabilityChecks() {
-			this.elements.content
-				.querySelectorAll("[data-font-name]")
-				.forEach((elem) => {
-					if (
-						elem.dataset.fontName &&
-						!this.fontChecker.isAvailable(elem.dataset.fontName)
-					) {
-						elem
-							.closest(".font-item-wrapper")
-							.classList.add("font-unavailable");
-					}
-				});
 		},
 
 		updateCompareLabel() {
@@ -531,6 +322,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 			);
 			storage.set("fontSize", size);
 		},
+
 		applyTheme(theme) {
 			const osPrefersDark = window.matchMedia(
 				"(prefers-color-scheme: dark)",
@@ -543,22 +335,26 @@ document.addEventListener("DOMContentLoaded", async () => {
 			storage.set("theme", theme);
 			this.updateThemeIcon();
 		},
+
 		cycleTheme() {
 			const order = ["auto", "light", "dark"];
 			const current = storage.get("theme", "auto");
 			const next = order[(order.indexOf(current) + 1) % order.length];
 			this.applyTheme(next);
 		},
+
 		updateThemeIcon() {
 			this.elements.themeToggle.innerHTML =
-				this.themeIcons[storage.get("theme", "auto")];
+				themeIcons[storage.get("theme", "auto")];
 		},
+
 		saveComparisonSet() {
 			storage.set(
 				"comparisonSet",
 				JSON.stringify(Array.from(this.state.comparisonSet)),
 			);
 		},
+
 		saveFilters() {
 			storage.set("filters", JSON.stringify(this.state.filters));
 		},
@@ -574,7 +370,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 				`${savedFontSize}px`,
 			);
 
-			this.state.comparisonSet = new Set(storage.getJSON("comparisonSet", []));
+			this.state.comparisonSet = new Set(
+				storage.getJSON("comparisonSet", []),
+			);
 			this.updateCompareLabel();
 
 			const savedFilters = storage.getJSON("filters", null);
@@ -595,7 +393,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 		},
 
 		restoreOsOrder() {
-			const raw = localStorage.getItem("osOrder");
+			const raw = storage.get("osOrder", null);
 			if (!raw) return;
 			let savedOrder;
 			try {
@@ -603,28 +401,48 @@ document.addEventListener("DOMContentLoaded", async () => {
 			} catch {
 				return;
 			}
-			if (!savedOrder || !Array.isArray(savedOrder) || !this.state.fontData) return;
+			if (
+				!savedOrder ||
+				!Array.isArray(savedOrder) ||
+				!this.state.fontData
+			)
+				return;
 
 			const map = {};
-			this.state.fontData.operatingSystems.forEach((os) => { map[os.name] = os; });
+			this.state.fontData.operatingSystems.forEach((os) => {
+				map[os.name] = os;
+			});
 			const reordered = savedOrder
 				.map((name) => map[name])
 				.filter(Boolean);
 			const remaining = this.state.fontData.operatingSystems.filter(
 				(os) => !savedOrder.includes(os.name),
 			);
-			this.state.fontData.operatingSystems = reordered.concat(remaining);
+			this.state.fontData.operatingSystems =
+				reordered.concat(remaining);
 		},
 	};
 
-	const files = ["windows-11", "macos-tahoe", "ios-26", "android", "linux-gnome", "linux-kde-plasma", "linux-xfce", "linux-cinnamon"];
+	const files = [
+		"windows-11",
+		"macos-tahoe",
+		"ios-26",
+		"android",
+		"linux-gnome",
+		"linux-kde-plasma",
+		"linux-xfce",
+		"linux-cinnamon",
+	];
 	let operatingSystems;
 	try {
 		const responses = await Promise.all(
-			files.map((f) => fetch(`data/${f}.json`).then((r) => {
-				if (!r.ok) throw new Error(`Failed to load ${f}.json (${r.status})`);
-				return r;
-			})),
+			files.map((f) =>
+				fetch(`data/${f}.json`).then((r) => {
+					if (!r.ok)
+						throw new Error(`Failed to load ${f}.json (${r.status})`);
+					return r;
+				}),
+			),
 		);
 		operatingSystems = await Promise.all(responses.map((r) => r.json()));
 	} catch (err) {
