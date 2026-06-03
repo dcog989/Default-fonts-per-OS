@@ -1,23 +1,19 @@
-import { storage } from './storage.js';
-import { presets } from './constants.js';
+import { presets } from "./constants.js";
+import { onDragEnd, onDragOver, onDragStart, onDrop } from "./dragdrop.js";
 import {
+	restoreOsOrder,
+	saveComparisonSet,
+	saveFilters,
+} from "./preferences.js";
+import {
+	renderCompareView,
 	renderListView,
 	renderTableView,
-	renderCompareView,
 	runFontAvailabilityChecks,
-} from './renderer.js';
-import { applyTheme, cycleTheme } from './theme.js';
-import {
-	onDragStart,
-	onDragOver,
-	onDrop,
-	onDragEnd,
-} from './dragdrop.js';
-import {
-	saveFilters,
-	saveComparisonSet,
-	restoreOsOrder,
-} from './preferences.js';
+} from "./renderer.js";
+import { storage } from "./storage.js";
+import { fontChecker } from "./font-checker.js";
+import { applyTheme, cycleTheme } from "./theme.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
 	const App = {
@@ -101,6 +97,19 @@ document.addEventListener("DOMContentLoaded", async () => {
 		},
 
 		setupEventListeners() {
+			this.elements.modalClose = document.querySelector(".modal-close");
+			this.elements.modalOverlay = document.getElementById("font-modal");
+
+			this.elements.modalClose.addEventListener("click", () =>
+				this.closeFontModal(),
+			);
+			this.elements.modalOverlay.addEventListener("click", (e) => {
+				if (e.target === this.elements.modalOverlay) this.closeFontModal();
+			});
+			document.addEventListener("keydown", (e) => {
+				if (e.key === "Escape") this.closeFontModal();
+			});
+
 			this.elements.viewSelector.addEventListener("change", () =>
 				this.render(),
 			);
@@ -151,8 +160,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 			window
 				.matchMedia("(prefers-color-scheme: dark)")
 				.addEventListener("change", () => {
-					if (storage.get("theme", "auto") === "auto")
-						applyTheme(this, "auto");
+					if (storage.get("theme", "auto") === "auto") applyTheme(this, "auto");
 				});
 
 			this.elements.content.addEventListener("change", (e) => {
@@ -171,14 +179,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 			this.elements.content.addEventListener("dragover", (e) =>
 				onDragOver(this, e),
 			);
-			this.elements.content.addEventListener("drop", (e) =>
-				onDrop(this, e),
-			);
+			this.elements.content.addEventListener("drop", (e) => onDrop(this, e));
 			this.elements.content.addEventListener("dragend", (e) =>
 				onDragEnd(this, e),
 			);
 			this.elements.content.addEventListener("click", (e) =>
 				this.onCollapseClick(e),
+			);
+			this.elements.content.addEventListener("click", (e) =>
+				this.onFontClick(e),
 			);
 		},
 
@@ -216,6 +225,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 		},
 
 		render(skipFontCheck = false) {
+			this.closeFontModal();
 			const filteredData = this.applyFilters(
 				this.state.fontData.operatingSystems,
 			);
@@ -225,6 +235,61 @@ document.addEventListener("DOMContentLoaded", async () => {
 			else if (view === "table") renderTableView(this, filteredData);
 			else if (view === "compare") renderCompareView(this);
 			if (!skipFontCheck) runFontAvailabilityChecks(this);
+		},
+
+		// --- Font Modal ---
+		onFontClick(e) {
+			const item = e.target.closest(".font-display-item");
+			if (!item) return;
+			if (e.target.closest(".compare-checkbox")) return;
+			const fontName = item.dataset.fontName;
+			if (!fontName) return;
+			this.showFontModal(fontName);
+		},
+
+		findFontDetails(fontName) {
+			const oses = [];
+			let category = "";
+			for (const os of this.state.fontData.operatingSystems) {
+				for (const font of os.fonts) {
+					if (font.name === fontName) {
+						oses.push(os.name);
+						category = font.category;
+						break;
+					}
+				}
+			}
+			return { category, oses };
+		},
+
+		showFontModal(fontName) {
+			const { category, oses } = this.findFontDetails(fontName);
+			const cssName = fontName.includes(" ")
+				? `'${fontName}'`
+				: fontName;
+			const available = fontChecker.isAvailable(fontName);
+			const webSafe = this.state.webSafeFonts.has(fontName);
+			const specimenText =
+				"MANY YEARS LATER as he faced the firing squad, Colonel Aureliano Buendía was to remember that distant afternoon when his father took him to discover ice. At that time Macondo was a village of twenty adobe houses, built on the bank of a river of clear water that ran along a bed of polished stones, which were white and enormous, like prehistoric eggs. The world was so recent that many things lacked names, and in order to indicate them it was necessary to point. Every year during the month of March a family of ragged gypsies would set up their tents near the village, and with a great uproar of pipes and kettledrums they would display new inventions.	... 1234567890 ... !\"£$%^&*()[];'#,./";
+
+			const tags = [];
+			if (webSafe) tags.push(`<span class="modal-tag web-safe" title="Found on 3+ OSes">Web safe</span>`);
+			if (!available) tags.push(`<span class="modal-tag not-available" title="Using nearest equivalent font.">Not installed</span>`);
+
+			this.elements.modalBody = document.getElementById("modal-body");
+			this.elements.modalBody.innerHTML = `
+				<p class="modal-font-name" style="font-family: ${cssName}">${fontName} ${tags.join(" ")}</p>
+				<p class="modal-specimen" style="font-family: ${cssName}">${specimenText}</p>
+				<div class="modal-details">
+					<span><strong>Category:</strong> ${category || "—"}</span>
+					<span><strong>Found on:</strong> ${oses.join(", ") || "—"}</span>
+				</div>
+			`;
+			this.elements.modalOverlay.classList.remove("hidden");
+		},
+
+		closeFontModal() {
+			this.elements.modalOverlay.classList.add("hidden");
 		},
 
 		// --- Collapse ---
@@ -294,9 +359,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 				`${savedFontSize}px`,
 			);
 
-			this.state.comparisonSet = new Set(
-				storage.getJSON("comparisonSet", []),
-			);
+			this.state.comparisonSet = new Set(storage.getJSON("comparisonSet", []));
 			this.updateCompareLabel();
 
 			const savedFilters = storage.getJSON("filters", null);
@@ -332,8 +395,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 		const responses = await Promise.all(
 			files.map((f) =>
 				fetch(`data/${f}.json`).then((r) => {
-					if (!r.ok)
-						throw new Error(`Failed to load ${f}.json (${r.status})`);
+					if (!r.ok) throw new Error(`Failed to load ${f}.json (${r.status})`);
 					return r;
 				}),
 			),

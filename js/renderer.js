@@ -12,7 +12,7 @@ function createFontItemHTML(app, font, viewType) {
 	const textToShow = app.state.filters.text || defaultPangram;
 
 	if (viewType !== "table") {
-		return `<div class="font-item-wrapper">${checkboxHTML}<p class="font-display-item" style="font-family: '${cssName}'" data-font-name="${safeName}"><span class="font-name">${safeName}${webSafeIndicator}</span> ${textToShow}</p></div>`;
+		return `<div class="font-item-wrapper">${checkboxHTML}<fieldset class="font-display-item" style="font-family: '${cssName}'" data-font-name="${safeName}"><legend class="font-name">${safeName}${webSafeIndicator}</legend> ${textToShow}</fieldset></div>`;
 	}
 	if (viewType === "table") {
 		return `<div class="font-item-wrapper">${checkboxHTML}<span class="font-display-item" style="font-family: '${cssName}'" data-font-name="${safeName}">${safeName}${webSafeIndicator}</span></div>`;
