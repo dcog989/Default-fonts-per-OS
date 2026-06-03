@@ -1,11 +1,23 @@
 import { storage } from './storage.js';
-import { presets, themeIcons } from './constants.js';
+import { presets } from './constants.js';
 import {
 	renderListView,
 	renderTableView,
 	renderCompareView,
 	runFontAvailabilityChecks,
 } from './renderer.js';
+import { applyTheme, cycleTheme } from './theme.js';
+import {
+	onDragStart,
+	onDragOver,
+	onDrop,
+	onDragEnd,
+} from './dragdrop.js';
+import {
+	saveFilters,
+	saveComparisonSet,
+	restoreOsOrder,
+} from './preferences.js';
 
 document.addEventListener("DOMContentLoaded", async () => {
 	const App = {
@@ -96,12 +108,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 				this.applyFontSize(e.target.value),
 			);
 			this.elements.themeToggle.addEventListener("click", () =>
-				this.cycleTheme(),
+				cycleTheme(this),
 			);
 
 			this.elements.searchInput.addEventListener("input", (e) => {
 				this.state.filters.search = e.target.value.toLowerCase();
-				this.saveFilters();
+				saveFilters(this);
 				this.render();
 			});
 			this.elements.customTextInput.addEventListener("input", (e) => {
@@ -115,7 +127,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 			});
 			this.elements.categorySelector.addEventListener("change", (e) => {
 				this.state.filters.category = e.target.value;
-				this.saveFilters();
+				saveFilters(this);
 				this.render();
 			});
 
@@ -140,7 +152,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 				.matchMedia("(prefers-color-scheme: dark)")
 				.addEventListener("change", () => {
 					if (storage.get("theme", "auto") === "auto")
-						this.applyTheme("auto");
+						applyTheme(this, "auto");
 				});
 
 			this.elements.content.addEventListener("change", (e) => {
@@ -149,19 +161,21 @@ document.addEventListener("DOMContentLoaded", async () => {
 					if (e.target.checked) this.state.comparisonSet.add(fontName);
 					else this.state.comparisonSet.delete(fontName);
 					this.updateCompareLabel();
-					this.saveComparisonSet();
+					saveComparisonSet(this);
 				}
 			});
 
 			this.elements.content.addEventListener("dragstart", (e) =>
-				this.onDragStart(e),
+				onDragStart(this, e),
 			);
 			this.elements.content.addEventListener("dragover", (e) =>
-				this.onDragOver(e),
+				onDragOver(this, e),
 			);
-			this.elements.content.addEventListener("drop", (e) => this.onDrop(e));
+			this.elements.content.addEventListener("drop", (e) =>
+				onDrop(this, e),
+			);
 			this.elements.content.addEventListener("dragend", (e) =>
-				this.onDragEnd(e),
+				onDragEnd(this, e),
 			);
 			this.elements.content.addEventListener("click", (e) =>
 				this.onCollapseClick(e),
@@ -178,10 +192,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 			this.elements.categorySelector.querySelector(
 				'input[value="all"]',
 			).checked = true;
-			this.saveFilters();
+			saveFilters(this);
 
 			this.state.comparisonSet.clear();
-			this.saveComparisonSet();
+			saveComparisonSet(this);
 			this.updateCompareLabel();
 
 			this.render();
@@ -211,60 +225,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 			else if (view === "table") renderTableView(this, filteredData);
 			else if (view === "compare") renderCompareView(this);
 			if (!skipFontCheck) runFontAvailabilityChecks(this);
-		},
-
-		// --- Drag & Drop ---
-		dragSrc: null,
-		onDragStart(e) {
-			const set = e.target.closest(".os-set");
-			if (!set) return;
-			this.dragSrc = set;
-			set.classList.add("dragging");
-			e.dataTransfer.effectAllowed = "move";
-			e.dataTransfer.setData("text/plain", "");
-		},
-		onDragOver(e) {
-			if (!this.dragSrc) return;
-			e.preventDefault();
-			const target = e.target.closest(".os-set");
-			if (!target || target === this.dragSrc) return;
-			const rect = target.getBoundingClientRect();
-			const midY = rect.top + rect.height / 2;
-			if (e.clientY < midY) {
-				target.parentNode.insertBefore(this.dragSrc, target);
-			} else {
-				target.parentNode.insertBefore(this.dragSrc, target.nextSibling);
-			}
-		},
-		onDrop(e) {
-			e.preventDefault();
-		},
-		onDragEnd() {
-			if (this.dragSrc) this.dragSrc.classList.remove("dragging");
-			this.dragSrc = null;
-			this.persistOrder();
-		},
-
-		persistOrder() {
-			const domOrder = [
-				...this.elements.content.querySelectorAll(".os-set"),
-			].map((el) => el.dataset.osName);
-
-			if (!this.state.fontData) return;
-			const map = {};
-			this.state.fontData.operatingSystems.forEach((os) => {
-				map[os.name] = os;
-			});
-			const reordered = domOrder.map((name) => map[name]).filter(Boolean);
-			const remaining = this.state.fontData.operatingSystems.filter(
-				(os) => !domOrder.includes(os.name),
-			);
-			this.state.fontData.operatingSystems = reordered.concat(remaining);
-
-			const finalOrder = this.state.fontData.operatingSystems.map(
-				(os) => os.name,
-			);
-			storage.set("osOrder", JSON.stringify(finalOrder));
 		},
 
 		// --- Collapse ---
@@ -323,45 +283,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 			storage.set("fontSize", size);
 		},
 
-		applyTheme(theme) {
-			const osPrefersDark = window.matchMedia(
-				"(prefers-color-scheme: dark)",
-			).matches;
-			if (theme === "light" || (theme === "auto" && !osPrefersDark)) {
-				document.documentElement.classList.add("light-theme");
-			} else {
-				document.documentElement.classList.remove("light-theme");
-			}
-			storage.set("theme", theme);
-			this.updateThemeIcon();
-		},
-
-		cycleTheme() {
-			const order = ["auto", "light", "dark"];
-			const current = storage.get("theme", "auto");
-			const next = order[(order.indexOf(current) + 1) % order.length];
-			this.applyTheme(next);
-		},
-
-		updateThemeIcon() {
-			this.elements.themeToggle.innerHTML =
-				themeIcons[storage.get("theme", "auto")];
-		},
-
-		saveComparisonSet() {
-			storage.set(
-				"comparisonSet",
-				JSON.stringify(Array.from(this.state.comparisonSet)),
-			);
-		},
-
-		saveFilters() {
-			storage.set("filters", JSON.stringify(this.state.filters));
-		},
-
 		loadPreferences() {
 			const savedTheme = storage.get("theme", "auto");
-			this.applyTheme(savedTheme);
+			applyTheme(this, savedTheme);
 
 			const savedFontSize = storage.get("fontSize", "16");
 			this.elements.fontSizeSelector.value = savedFontSize;
@@ -389,37 +313,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 			this.state.collapsed = storage.getJSON("collapsed", null);
 
-			this.restoreOsOrder();
-		},
-
-		restoreOsOrder() {
-			const raw = storage.get("osOrder", null);
-			if (!raw) return;
-			let savedOrder;
-			try {
-				savedOrder = JSON.parse(raw);
-			} catch {
-				return;
-			}
-			if (
-				!savedOrder ||
-				!Array.isArray(savedOrder) ||
-				!this.state.fontData
-			)
-				return;
-
-			const map = {};
-			this.state.fontData.operatingSystems.forEach((os) => {
-				map[os.name] = os;
-			});
-			const reordered = savedOrder
-				.map((name) => map[name])
-				.filter(Boolean);
-			const remaining = this.state.fontData.operatingSystems.filter(
-				(os) => !savedOrder.includes(os.name),
-			);
-			this.state.fontData.operatingSystems =
-				reordered.concat(remaining);
+			restoreOsOrder(this);
 		},
 	};
 
