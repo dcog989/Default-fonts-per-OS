@@ -20,10 +20,8 @@ The list includes default fonts for: Windows 11, macOS Sonoma, iOS 17, Android, 
 
 ## Local Execution
 
-```text
-python -m http.server
-# or
-bunx http-server
+```sh
+echo "http://localhost:9000" && bunx bunserv --port 9000
 ```
 
 ## References
