@@ -38,12 +38,14 @@ document.addEventListener('DOMContentLoaded', () => {
         modalClose: document.querySelector('.modal-close'),
         modalOverlay: document.getElementById('font-modal'),
         modalBody: document.getElementById('modal-body'),
+        appVersion: document.getElementById('app-version'),
       };
     },
 
     init(data) {
       this.cacheElements();
       this.state.fontData = data;
+      this.elements.appVersion.textContent = `v${typeof APP_VERSION !== 'undefined' ? APP_VERSION : 'dev'}`;
       this.populateFontSizeSelector();
       this.calculateWebSafeFonts();
       this.setupCategoryFilter();

@@ -25,7 +25,8 @@ jobs:
 
       - name: Build (bundle + minify)
         run: |
-          npx --yes esbuild@0.28.1 js/app.js --bundle --minify --format=esm --outfile=dist/js/app.js
+          VERSION=$(node -p "require('./package.json').version")
+          npx --yes esbuild@0.28.1 js/app.js --bundle --minify --format=esm --define:APP_VERSION="\"$VERSION\"" --outfile=dist/js/app.js
           npx --yes esbuild@0.28.1 css/main.css --minify --outfile=dist/css/main.css
           cp index.html dist/index.html
           cp favicon.svg dist/favicon.svg
