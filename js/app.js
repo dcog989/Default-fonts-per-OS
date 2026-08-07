@@ -179,7 +179,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 			this.elements.content.addEventListener("dragover", (e) =>
 				onDragOver(this, e),
 			);
-			this.elements.content.addEventListener("drop", (e) => onDrop(this, e));
+			this.elements.content.addEventListener("drop", (e) =>
+				onDrop(e),
+			);
 			this.elements.content.addEventListener("dragend", (e) =>
 				onDragEnd(this, e),
 			);
@@ -241,7 +243,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 		onFontClick(e) {
 			const item = e.target.closest(".font-display-item");
 			if (!item) return;
-			if (e.target.closest(".compare-checkbox")) return;
 			const fontName = item.dataset.fontName;
 			if (!fontName) return;
 			this.showFontModal(fontName);

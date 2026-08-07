@@ -24,7 +24,8 @@ export function onDragOver(app, e) {
 	}
 }
 
-export function onDrop(app, e) {
+export function onDrop(e) {
+	// Prevent the browser default drop action (navigating to dropped data).
 	e.preventDefault();
 }
 
