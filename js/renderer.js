@@ -74,8 +74,10 @@ export const viewRenderers = {
 };
 
 export function runFontAvailabilityChecks(app) {
-  app.elements.content.querySelectorAll('[data-font-name]').forEach((elem) => {
-    if (elem.dataset.fontName && !fontChecker.isAvailable(elem.dataset.fontName)) {
+  const items = [...app.elements.content.querySelectorAll('[data-font-name]')];
+  const availability = fontChecker.areAvailable(items.map((elem) => elem.dataset.fontName).filter(Boolean));
+  items.forEach((elem) => {
+    if (!availability.get(elem.dataset.fontName.toLowerCase())) {
       elem.closest('.font-item-wrapper').classList.add('font-unavailable');
     }
   });
