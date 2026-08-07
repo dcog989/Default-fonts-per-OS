@@ -20,5 +20,5 @@ export function cycleTheme(toggleEl) {
 }
 
 export function updateThemeIcon(toggleEl) {
-  toggleEl.innerHTML = themeIcons[storage.get('theme', 'auto')];
+  toggleEl.innerHTML = themeIcons[storage.get('theme', 'auto')] ?? themeIcons.auto;
 }
