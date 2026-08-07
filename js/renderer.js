@@ -1,5 +1,5 @@
-import { escapeCSS, escapeHTML, defaultPangram } from './constants.js';
-import { fontChecker } from './font-checker.js';
+import { defaultPangram, escapeCSS, escapeHTML } from "./constants.js";
+import { fontChecker } from "./font-checker.js";
 
 function createFontItemHTML(app, font, viewType) {
 	const isChecked = app.state.comparisonSet.has(font.name) ? "checked" : "";
@@ -37,7 +37,7 @@ export function renderListView(app, data) {
 	app.elements.content.innerHTML = data
 		.map(
 			(os) =>
-				`<div class="os-set" draggable="true" data-os-name="${escapeHTML(os.name)}"><div class="os-set-header">${renderCollapseIcon(app, os.name)}<h2>${os.name} (${os.fonts.length})</h2></div>${os.fonts.map((font) => createFontItemHTML(app, font, "list")).join("")}</div>`,
+				`<div class="os-set" draggable="true" data-os-name="${escapeHTML(os.name)}"><div class="os-set-header">${renderCollapseIcon(app, os.name)}<h2>${os.name} (${os.fonts.length})</h2></div>${os.fonts.map((font) => createFontItemHTML(app, font, "list")).join("")}</div>`
 		)
 		.join("");
 	restoreCollapsedStates(app);
@@ -61,10 +61,10 @@ export function renderCompareView(app) {
 		return;
 	}
 	const allFonts = app.state.fontData.operatingSystems.flatMap(
-		(os) => os.fonts,
+		(os) => os.fonts
 	);
 	const fontsToCompare = [
-		...new Map(allFonts.map((f) => [f.name, f])).values(),
+		...new Map(allFonts.map((f) => [f.name, f])).values()
 	].filter((font) => app.state.comparisonSet.has(font.name));
 	app.elements.content.innerHTML = `<h2>Comparison (${fontsToCompare.length})</h2>${fontsToCompare.map((font) => createFontItemHTML(app, font, "compare")).join("")}`;
 }
@@ -72,20 +72,16 @@ export function renderCompareView(app) {
 export const viewRenderers = {
 	list: renderListView,
 	table: renderTableView,
-	compare: renderCompareView,
+	compare: renderCompareView
 };
 
 export function runFontAvailabilityChecks(app) {
-	app.elements.content
-		.querySelectorAll("[data-font-name]")
-		.forEach((elem) => {
-			if (
-				elem.dataset.fontName &&
-				!fontChecker.isAvailable(elem.dataset.fontName)
-			) {
-				elem
-					.closest(".font-item-wrapper")
-					.classList.add("font-unavailable");
-			}
-		});
+	app.elements.content.querySelectorAll("[data-font-name]").forEach((elem) => {
+		if (
+			elem.dataset.fontName &&
+			!fontChecker.isAvailable(elem.dataset.fontName)
+		) {
+			elem.closest(".font-item-wrapper").classList.add("font-unavailable");
+		}
+	});
 }

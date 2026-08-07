@@ -21,7 +21,8 @@ The list includes default fonts for: Windows 11, macOS Sonoma, iOS 17, Android, 
 ## Local Execution
 
 ```sh
-echo "http://localhost:9000" && bunx bunserv --port 9000
+bun install && bun run dev
+# http://localhost:9000
 ```
 
 ## References

@@ -1,4 +1,4 @@
-import { fontconfigAliases } from './constants.js';
+import { fontconfigAliases } from "./constants.js";
 
 export const fontChecker = {
 	cache: {},
@@ -9,7 +9,8 @@ export const fontChecker = {
 	init() {
 		if (this.testContainer) return;
 		this.testContainer = document.createElement("div");
-		this.testContainer.style.cssText = "position:absolute;top:-9999px;left:-9999px;";
+		this.testContainer.style.cssText =
+			"position:absolute;top:-9999px;left:-9999px;";
 		document.body.appendChild(this.testContainer);
 	},
 
@@ -72,5 +73,5 @@ export const fontChecker = {
 
 		this.cache[fontLower] = isAvailable;
 		return isAvailable;
-	},
+	}
 };

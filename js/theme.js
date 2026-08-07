@@ -1,9 +1,9 @@
-import { storage } from './storage.js';
-import { themeIcons } from './constants.js';
+import { themeIcons } from "./constants.js";
+import { storage } from "./storage.js";
 
 export function applyTheme(theme, toggleEl) {
 	const osPrefersDark = window.matchMedia(
-		"(prefers-color-scheme: dark)",
+		"(prefers-color-scheme: dark)"
 	).matches;
 	if (theme === "light" || (theme === "auto" && !osPrefersDark)) {
 		document.documentElement.classList.add("light-theme");

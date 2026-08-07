@@ -20,5 +20,5 @@ export const storage = {
 		} catch {
 			return fallback;
 		}
-	},
+	}
 };

@@ -1,4 +1,4 @@
-import { toCSSFontFamily, specimenText } from "./constants.js";
+import { specimenText, toCSSFontFamily } from "./constants.js";
 import { fontChecker } from "./font-checker.js";
 
 export function findFontDetails(fontData, fontName) {
@@ -23,8 +23,14 @@ export function openFontModal(state, elements, fontName) {
 	const webSafe = state.webSafeFonts.has(fontName);
 
 	const tags = [];
-	if (webSafe) tags.push(`<span class="modal-tag web-safe" title="Found on 3+ OSes">Web safe</span>`);
-	if (!available) tags.push(`<span class="modal-tag not-available" title="Using nearest equivalent font.">Not installed</span>`);
+	if (webSafe)
+		tags.push(
+			`<span class="modal-tag web-safe" title="Found on 3+ OSes">Web safe</span>`
+		);
+	if (!available)
+		tags.push(
+			`<span class="modal-tag not-available" title="Using nearest equivalent font.">Not installed</span>`
+		);
 
 	elements.modalBody.innerHTML = `
 		<p class="modal-font-name" style="font-family: ${cssName}">${fontName} ${tags.join(" ")}</p>

@@ -1,4 +1,4 @@
-import { storage } from './storage.js';
+import { storage } from "./storage.js";
 
 export function saveFilters(app) {
 	storage.set("filters", JSON.stringify(app.state.filters));
@@ -7,7 +7,7 @@ export function saveFilters(app) {
 export function saveComparisonSet(app) {
 	storage.set(
 		"comparisonSet",
-		JSON.stringify(Array.from(app.state.comparisonSet)),
+		JSON.stringify(Array.from(app.state.comparisonSet))
 	);
 }
 
@@ -30,15 +30,10 @@ export function restoreOsOrder(app) {
 	} catch {
 		return;
 	}
-	if (
-		!savedOrder ||
-		!Array.isArray(savedOrder) ||
-		!app.state.fontData
-	)
-		return;
+	if (!savedOrder || !Array.isArray(savedOrder) || !app.state.fontData) return;
 
 	app.state.fontData.operatingSystems = reorderOperatingSystems(
 		app.state.fontData.operatingSystems,
-		savedOrder,
+		savedOrder
 	);
 }

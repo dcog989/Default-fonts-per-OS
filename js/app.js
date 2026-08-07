@@ -1,18 +1,15 @@
+import { copySelectedFonts } from "./clipboard.js";
 import { DEFAULT_FONT_SIZE, presets } from "./constants.js";
 import { onDragEnd, onDragOver, onDragStart, onDrop } from "./dragdrop.js";
-import { copySelectedFonts } from "./clipboard.js";
+import { closeFontModal, onFontClick } from "./modal.js";
 import {
 	restoreOsOrder,
 	saveComparisonSet,
-	saveFilters,
+	saveFilters
 } from "./preferences.js";
-import {
-	runFontAvailabilityChecks,
-	viewRenderers,
-} from "./renderer.js";
+import { runFontAvailabilityChecks, viewRenderers } from "./renderer.js";
 import { storage } from "./storage.js";
 import { applyTheme, cycleTheme } from "./theme.js";
-import { closeFontModal, onFontClick } from "./modal.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
 	const App = {
@@ -23,7 +20,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 			webSafeFonts: new Set(),
 			comparisonSet: new Set(),
 			filters: { search: "", text: "", category: "all" },
-			collapsed: null,
+			collapsed: null
 		},
 
 		cacheElements() {
@@ -43,7 +40,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 				presetSelector: document.getElementById("preset-selector"),
 				modalClose: document.querySelector(".modal-close"),
 				modalOverlay: document.getElementById("font-modal"),
-				modalBody: document.getElementById("modal-body"),
+				modalBody: document.getElementById("modal-body")
 			};
 		},
 
@@ -92,7 +89,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 					(cat) => `
 				<input type="radio" id="cat-${cat}" name="category" value="${cat}">
 				<label for="cat-${cat}">${cat.charAt(0).toUpperCase() + cat.slice(1)}</label>
-			`,
+			`
 				)
 				.join("");
 			this.elements.categoryControls.style.display = "flex";
@@ -100,7 +97,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 		setupEventListeners() {
 			this.elements.modalClose.addEventListener("click", () =>
-				closeFontModal(this.elements),
+				closeFontModal(this.elements)
 			);
 			this.elements.modalOverlay.addEventListener("click", (e) => {
 				if (e.target === this.elements.modalOverlay)
@@ -111,13 +108,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 			});
 
 			this.elements.viewSelector.addEventListener("change", () =>
-				this.render(),
+				this.render()
 			);
 			this.elements.fontSizeSelector.addEventListener("change", (e) =>
-				this.applyFontSize(e.target.value),
+				this.applyFontSize(e.target.value)
 			);
 			this.elements.themeToggle.addEventListener("click", () =>
-				cycleTheme(this.elements.themeToggle),
+				cycleTheme(this.elements.themeToggle)
 			);
 
 			this.elements.searchInput.addEventListener("input", (e) => {
@@ -143,29 +140,30 @@ document.addEventListener("DOMContentLoaded", async () => {
 			});
 
 			this.elements.clearAllButton.addEventListener("click", () =>
-				this.clearAll(),
+				this.clearAll()
 			);
 			this.elements.copySelectedButton.addEventListener("click", () =>
 				copySelectedFonts(
 					this.state.comparisonSet,
-					this.elements.copySelectedButton,
-				),
+					this.elements.copySelectedButton
+				)
 			);
 
 			window.addEventListener("scroll", () =>
 				this.elements.backToTopButton.classList.toggle(
 					"show",
-					window.scrollY > 200,
-				),
+					window.scrollY > 200
+				)
 			);
 			this.elements.backToTopButton.addEventListener("click", () =>
-				window.scrollTo(0, 0),
+				window.scrollTo(0, 0)
 			);
 
 			window
 				.matchMedia("(prefers-color-scheme: dark)")
 				.addEventListener("change", () => {
-					if (storage.get("theme", "auto") === "auto") applyTheme("auto", this.elements.themeToggle);
+					if (storage.get("theme", "auto") === "auto")
+						applyTheme("auto", this.elements.themeToggle);
 				});
 
 			this.elements.content.addEventListener("change", (e) => {
@@ -179,22 +177,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 			});
 
 			this.elements.content.addEventListener("dragstart", (e) =>
-				onDragStart(this, e),
+				onDragStart(this, e)
 			);
 			this.elements.content.addEventListener("dragover", (e) =>
-				onDragOver(this, e),
+				onDragOver(this, e)
 			);
-			this.elements.content.addEventListener("drop", (e) =>
-				onDrop(e),
-			);
-			this.elements.content.addEventListener("dragend", (e) =>
-				onDragEnd(this, e),
+			this.elements.content.addEventListener("drop", (e) => onDrop(e));
+			this.elements.content.addEventListener("dragend", () => onDragEnd(this));
+			this.elements.content.addEventListener("click", (e) =>
+				this.onCollapseClick(e)
 			);
 			this.elements.content.addEventListener("click", (e) =>
-				this.onCollapseClick(e),
-			);
-			this.elements.content.addEventListener("click", (e) =>
-				onFontClick(this.state, this.elements, e),
+				onFontClick(this.state, this.elements, e)
 			);
 		},
 
@@ -206,7 +200,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 			this.elements.customTextInput.value = "";
 			this.elements.presetSelector.value = "";
 			this.elements.categorySelector.querySelector(
-				'input[value="all"]',
+				'input[value="all"]'
 			).checked = true;
 			saveFilters(this);
 
@@ -228,8 +222,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 					fonts: os.fonts.filter(
 						(font) =>
 							font.name.toLowerCase().includes(search) &&
-							(category === "all" || font.category === category),
-					),
+							(category === "all" || font.category === category)
+					)
 				}))
 				.filter((os) => os.fonts.length > 0);
 		},
@@ -237,7 +231,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 		render(skipFontCheck = false) {
 			closeFontModal(this.elements);
 			const filteredData = this.applyFilters(
-				this.state.fontData.operatingSystems,
+				this.state.fontData.operatingSystems
 			);
 			const view =
 				this.elements.viewSelector.querySelector("input:checked").value;
@@ -272,7 +266,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 		setSampleFontSize(size) {
 			document.documentElement.style.setProperty(
 				"--sample-font-size",
-				`${size}px`,
+				`${size}px`
 			);
 		},
 
@@ -293,7 +287,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 				this.elements.searchInput.value = savedFilters.search;
 				this.elements.customTextInput.value = savedFilters.text ?? "";
 				const categoryInput = this.elements.categorySelector.querySelector(
-					`input[value="${savedFilters.category}"]`,
+					`input[value="${savedFilters.category}"]`
 				);
 				if (categoryInput) {
 					categoryInput.checked = true;
@@ -303,7 +297,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 			this.state.collapsed = storage.getJSON("collapsed", null);
 
 			restoreOsOrder(this);
-		},
+		}
 	};
 
 	const files = [
@@ -314,7 +308,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 		"linux-gnome",
 		"linux-kde-plasma",
 		"linux-xfce",
-		"linux-cinnamon",
+		"linux-cinnamon"
 	];
 	let operatingSystems;
 	try {
@@ -323,8 +317,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 				fetch(`data/${f}.json`).then((r) => {
 					if (!r.ok) throw new Error(`Failed to load ${f}.json (${r.status})`);
 					return r;
-				}),
-			),
+				})
+			)
 		);
 		operatingSystems = await Promise.all(responses.map((r) => r.json()));
 	} catch (err) {

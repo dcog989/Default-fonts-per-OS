@@ -4,3 +4,4 @@
 repomix.config.json
 .repomixignore
 test-results/
+node_modules/
