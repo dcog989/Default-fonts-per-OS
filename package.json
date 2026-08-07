@@ -4,12 +4,14 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
+		"check": "biome check .",
+		"clean": "rm -rf .context node_modules .vitest bun.lock",
 		"dev": "bun server.js",
-		"lint": "biome lint .",
-		"lint:fix": "biome lint --write .",
 		"format": "biome format .",
 		"format:fix": "biome format --write .",
-		"check": "biome check ."
+		"lint": "biome lint .",
+		"lint:fix": "biome lint --write .",
+		"update": "bun update --latest"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.5.7"
