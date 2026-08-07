@@ -11,6 +11,16 @@ export function saveComparisonSet(app) {
 	);
 }
 
+export function reorderOperatingSystems(operatingSystems, order) {
+	const map = {};
+	operatingSystems.forEach((os) => {
+		map[os.name] = os;
+	});
+	const reordered = order.map((name) => map[name]).filter(Boolean);
+	const remaining = operatingSystems.filter((os) => !order.includes(os.name));
+	return reordered.concat(remaining);
+}
+
 export function restoreOsOrder(app) {
 	const raw = storage.get("osOrder", null);
 	if (!raw) return;
@@ -27,16 +37,8 @@ export function restoreOsOrder(app) {
 	)
 		return;
 
-	const map = {};
-	app.state.fontData.operatingSystems.forEach((os) => {
-		map[os.name] = os;
-	});
-	const reordered = savedOrder
-		.map((name) => map[name])
-		.filter(Boolean);
-	const remaining = app.state.fontData.operatingSystems.filter(
-		(os) => !savedOrder.includes(os.name),
+	app.state.fontData.operatingSystems = reorderOperatingSystems(
+		app.state.fontData.operatingSystems,
+		savedOrder,
 	);
-	app.state.fontData.operatingSystems =
-		reordered.concat(remaining);
 }

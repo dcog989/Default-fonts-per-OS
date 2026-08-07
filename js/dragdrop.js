@@ -1,4 +1,5 @@
 import { storage } from './storage.js';
+import { reorderOperatingSystems } from './preferences.js';
 
 export function onDragStart(app, e) {
 	const set = e.target.closest(".os-set");
@@ -39,15 +40,10 @@ export function persistOrder(app) {
 	].map((el) => el.dataset.osName);
 
 	if (!app.state.fontData) return;
-	const map = {};
-	app.state.fontData.operatingSystems.forEach((os) => {
-		map[os.name] = os;
-	});
-	const reordered = domOrder.map((name) => map[name]).filter(Boolean);
-	const remaining = app.state.fontData.operatingSystems.filter(
-		(os) => !domOrder.includes(os.name),
+	app.state.fontData.operatingSystems = reorderOperatingSystems(
+		app.state.fontData.operatingSystems,
+		domOrder,
 	);
-	app.state.fontData.operatingSystems = reordered.concat(remaining);
 
 	const finalOrder = app.state.fontData.operatingSystems.map(
 		(os) => os.name,

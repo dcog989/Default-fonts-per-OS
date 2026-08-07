@@ -1,4 +1,4 @@
-import { presets } from "./constants.js";
+import { presets, toCSSFontFamily } from "./constants.js";
 import { onDragEnd, onDragOver, onDragStart, onDrop } from "./dragdrop.js";
 import {
 	restoreOsOrder,
@@ -264,9 +264,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 		showFontModal(fontName) {
 			const { category, oses } = this.findFontDetails(fontName);
-			const cssName = fontName.includes(" ")
-				? `'${fontName}'`
-				: fontName;
+			const cssName = toCSSFontFamily(fontName);
 			const available = fontChecker.isAvailable(fontName);
 			const webSafe = this.state.webSafeFonts.has(fontName);
 			const specimenText =
@@ -314,7 +312,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 		copySelectedFonts() {
 			if (this.state.comparisonSet.size === 0) return;
 			const fontList = Array.from(this.state.comparisonSet)
-				.map((font) => (font.includes(" ") ? `'${font}'` : font))
+				.map(toCSSFontFamily)
 				.join(", ");
 			const cssString = `font-family: ${fontList};`;
 			navigator.clipboard
@@ -341,11 +339,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 		},
 
 		applyFontSize(size) {
+			this.setSampleFontSize(size);
+			storage.set("fontSize", size);
+		},
+
+		setSampleFontSize(size) {
 			document.documentElement.style.setProperty(
 				"--sample-font-size",
 				`${size}px`,
 			);
-			storage.set("fontSize", size);
 		},
 
 		loadPreferences() {
@@ -354,10 +356,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 			const savedFontSize = storage.get("fontSize", "16");
 			this.elements.fontSizeSelector.value = savedFontSize;
-			document.documentElement.style.setProperty(
-				"--sample-font-size",
-				`${savedFontSize}px`,
-			);
+			this.setSampleFontSize(savedFontSize);
 
 			this.state.comparisonSet = new Set(storage.getJSON("comparisonSet", []));
 			this.updateCompareLabel();
