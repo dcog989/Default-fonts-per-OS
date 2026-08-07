@@ -37,10 +37,10 @@
 ## File System Access
 
 - Root: `<project root>`
-- Allowed: All subdirectories, `/tmp/<project-name>`
+- Allowed: All project files, `/tmp/<project-name>`
 - Read-Only: `.env*`, `.git/`
 - Disallowed: system dirs, user config, other projects
-- Require confirmation: adding/removing dependencies, changes outside `src/`, any operation outside project root
+- Require confirmation: adding/removing dependencies, any operation outside project root
 
 ## Rules
 
