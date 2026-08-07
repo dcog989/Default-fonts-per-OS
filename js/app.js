@@ -1,4 +1,4 @@
-import { presets, toCSSFontFamily } from "./constants.js";
+import { presets, specimenText, toCSSFontFamily } from "./constants.js";
 import { onDragEnd, onDragOver, onDragStart, onDrop } from "./dragdrop.js";
 import {
 	restoreOsOrder,
@@ -268,7 +268,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 			const cssName = toCSSFontFamily(fontName);
 			const available = fontChecker.isAvailable(fontName);
 			const webSafe = this.state.webSafeFonts.has(fontName);
-			const specimenText =
 				"MANY YEARS LATER as he faced the firing squad, Colonel Aureliano Buendía was to remember that distant afternoon when his father took him to discover ice. At that time Macondo was a village of twenty adobe houses, built on the bank of a river of clear water that ran along a bed of polished stones, which were white and enormous, like prehistoric eggs. The world was so recent that many things lacked names, and in order to indicate them it was necessary to point. Every year during the month of March a family of ragged gypsies would set up their tents near the village, and with a great uproar of pipes and kettledrums they would display new inventions.	... 1234567890 ... !\"£$%^&*()[];'#,./";
 
 			const tags = [];

@@ -1,6 +1,9 @@
 export const defaultPangram =
 	"When zombies arrive, quickly fax Judge Pat. 1234567890.";
 
+export const specimenText =
+	"MANY YEARS LATER as he faced the firing squad, Colonel Aureliano Buendía was to remember that distant afternoon when his father took him to discover ice. At that time Macondo was a village of twenty adobe houses, built on the bank of a river of clear water that ran along a bed of polished stones, which were white and enormous, like prehistoric eggs. The world was so recent that many things lacked names, and in order to indicate them it was necessary to point. Every year during the month of March a family of ragged gypsies would set up their tents near the village, and with a great uproar of pipes and kettledrums they would display new inventions.\t... 1234567890 ... !\"£$%^&*()[];'#,./";
+
 export const presets = {
 	"": "",
 	alphabet: "ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz",
