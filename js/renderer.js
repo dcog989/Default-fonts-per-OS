@@ -69,6 +69,12 @@ export function renderCompareView(app) {
 	app.elements.content.innerHTML = `<h2>Comparison (${fontsToCompare.length})</h2>${fontsToCompare.map((font) => createFontItemHTML(app, font, "compare")).join("")}`;
 }
 
+export const viewRenderers = {
+	list: renderListView,
+	table: renderTableView,
+	compare: renderCompareView,
+};
+
 export function runFontAvailabilityChecks(app) {
 	app.elements.content
 		.querySelectorAll("[data-font-name]")

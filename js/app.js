@@ -1,19 +1,18 @@
-import { presets, specimenText, toCSSFontFamily } from "./constants.js";
+import { presets } from "./constants.js";
 import { onDragEnd, onDragOver, onDragStart, onDrop } from "./dragdrop.js";
+import { copySelectedFonts } from "./clipboard.js";
 import {
 	restoreOsOrder,
 	saveComparisonSet,
 	saveFilters,
 } from "./preferences.js";
 import {
-	renderCompareView,
-	renderListView,
-	renderTableView,
 	runFontAvailabilityChecks,
+	viewRenderers,
 } from "./renderer.js";
 import { storage } from "./storage.js";
-import { fontChecker } from "./font-checker.js";
 import { applyTheme, cycleTheme } from "./theme.js";
+import { closeFontModal, onFontClick } from "./modal.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
 	const App = {
@@ -42,6 +41,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 				clearAllButton: document.getElementById("clear-all-button"),
 				copySelectedButton: document.getElementById("copy-selected-button"),
 				presetSelector: document.getElementById("preset-selector"),
+				modalClose: document.querySelector(".modal-close"),
+				modalOverlay: document.getElementById("font-modal"),
+				modalBody: document.getElementById("modal-body"),
 			};
 		},
 
@@ -97,17 +99,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 		},
 
 		setupEventListeners() {
-			this.elements.modalClose = document.querySelector(".modal-close");
-			this.elements.modalOverlay = document.getElementById("font-modal");
-
 			this.elements.modalClose.addEventListener("click", () =>
-				this.closeFontModal(),
+				closeFontModal(this.elements),
 			);
 			this.elements.modalOverlay.addEventListener("click", (e) => {
-				if (e.target === this.elements.modalOverlay) this.closeFontModal();
+				if (e.target === this.elements.modalOverlay)
+					closeFontModal(this.elements);
 			});
 			document.addEventListener("keydown", (e) => {
-				if (e.key === "Escape") this.closeFontModal();
+				if (e.key === "Escape") closeFontModal(this.elements);
 			});
 
 			this.elements.viewSelector.addEventListener("change", () =>
@@ -117,7 +117,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 				this.applyFontSize(e.target.value),
 			);
 			this.elements.themeToggle.addEventListener("click", () =>
-				cycleTheme(this),
+				cycleTheme(this.elements.themeToggle),
 			);
 
 			this.elements.searchInput.addEventListener("input", (e) => {
@@ -144,7 +144,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 				this.clearAll(),
 			);
 			this.elements.copySelectedButton.addEventListener("click", () =>
-				this.copySelectedFonts(),
+				copySelectedFonts(
+					this.state.comparisonSet,
+					this.elements.copySelectedButton,
+				),
 			);
 
 			window.addEventListener("scroll", () =>
@@ -160,7 +163,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 			window
 				.matchMedia("(prefers-color-scheme: dark)")
 				.addEventListener("change", () => {
-					if (storage.get("theme", "auto") === "auto") applyTheme(this, "auto");
+					if (storage.get("theme", "auto") === "auto") applyTheme("auto", this.elements.themeToggle);
 				});
 
 			this.elements.content.addEventListener("change", (e) => {
@@ -189,7 +192,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 				this.onCollapseClick(e),
 			);
 			this.elements.content.addEventListener("click", (e) =>
-				this.onFontClick(e),
+				onFontClick(this.state, this.elements, e),
 			);
 		},
 
@@ -227,67 +230,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 		},
 
 		render(skipFontCheck = false) {
-			this.closeFontModal();
+			closeFontModal(this.elements);
 			const filteredData = this.applyFilters(
 				this.state.fontData.operatingSystems,
 			);
 			const view =
 				this.elements.viewSelector.querySelector("input:checked").value;
-			if (view === "list") renderListView(this, filteredData);
-			else if (view === "table") renderTableView(this, filteredData);
-			else if (view === "compare") renderCompareView(this);
+			viewRenderers[view]?.(this, filteredData);
 			if (!skipFontCheck) runFontAvailabilityChecks(this);
-		},
-
-		// --- Font Modal ---
-		onFontClick(e) {
-			const item = e.target.closest(".font-display-item");
-			if (!item) return;
-			const fontName = item.dataset.fontName;
-			if (!fontName) return;
-			this.showFontModal(fontName);
-		},
-
-		findFontDetails(fontName) {
-			const oses = [];
-			let category = "";
-			for (const os of this.state.fontData.operatingSystems) {
-				for (const font of os.fonts) {
-					if (font.name === fontName) {
-						oses.push(os.name);
-						category = font.category;
-						break;
-					}
-				}
-			}
-			return { category, oses };
-		},
-
-		showFontModal(fontName) {
-			const { category, oses } = this.findFontDetails(fontName);
-			const cssName = toCSSFontFamily(fontName);
-			const available = fontChecker.isAvailable(fontName);
-			const webSafe = this.state.webSafeFonts.has(fontName);
-				"MANY YEARS LATER as he faced the firing squad, Colonel Aureliano Buendía was to remember that distant afternoon when his father took him to discover ice. At that time Macondo was a village of twenty adobe houses, built on the bank of a river of clear water that ran along a bed of polished stones, which were white and enormous, like prehistoric eggs. The world was so recent that many things lacked names, and in order to indicate them it was necessary to point. Every year during the month of March a family of ragged gypsies would set up their tents near the village, and with a great uproar of pipes and kettledrums they would display new inventions.	... 1234567890 ... !\"£$%^&*()[];'#,./";
-
-			const tags = [];
-			if (webSafe) tags.push(`<span class="modal-tag web-safe" title="Found on 3+ OSes">Web safe</span>`);
-			if (!available) tags.push(`<span class="modal-tag not-available" title="Using nearest equivalent font.">Not installed</span>`);
-
-			this.elements.modalBody = document.getElementById("modal-body");
-			this.elements.modalBody.innerHTML = `
-				<p class="modal-font-name" style="font-family: ${cssName}">${fontName} ${tags.join(" ")}</p>
-				<p class="modal-specimen" style="font-family: ${cssName}">${specimenText}</p>
-				<div class="modal-details">
-					<span><strong>Category:</strong> ${category || "—"}</span>
-					<span><strong>Found on:</strong> ${oses.join(", ") || "—"}</span>
-				</div>
-			`;
-			this.elements.modalOverlay.classList.remove("hidden");
-		},
-
-		closeFontModal() {
-			this.elements.modalOverlay.classList.add("hidden");
 		},
 
 		// --- Collapse ---
@@ -309,35 +259,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 			this.elements.copySelectedButton.disabled = size === 0;
 		},
 
-		copySelectedFonts() {
-			if (this.state.comparisonSet.size === 0) return;
-			const fontList = Array.from(this.state.comparisonSet)
-				.map(toCSSFontFamily)
-				.join(", ");
-			const cssString = `font-family: ${fontList};`;
-			navigator.clipboard
-				.writeText(cssString)
-				.then(() => {
-					const button = this.elements.copySelectedButton;
-					const originalText = button.textContent;
-					const currentWidth = button.offsetWidth;
-					button.style.minWidth = `${currentWidth}px`;
-					button.textContent = "Copied!";
-					setTimeout(() => {
-						button.textContent = originalText;
-						button.style.minWidth = "";
-					}, 1500);
-				})
-				.catch(() => {
-					const button = this.elements.copySelectedButton;
-					const originalText = button.textContent;
-					button.textContent = "Failed";
-					setTimeout(() => {
-						button.textContent = originalText;
-					}, 1500);
-				});
-		},
-
 		applyFontSize(size) {
 			this.setSampleFontSize(size);
 			storage.set("fontSize", size);
@@ -352,7 +273,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 		loadPreferences() {
 			const savedTheme = storage.get("theme", "auto");
-			applyTheme(this, savedTheme);
+			applyTheme(savedTheme, this.elements.themeToggle);
 
 			const savedFontSize = storage.get("fontSize", "16");
 			this.elements.fontSizeSelector.value = savedFontSize;

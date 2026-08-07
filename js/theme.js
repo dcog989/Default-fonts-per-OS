@@ -1,7 +1,7 @@
 import { storage } from './storage.js';
 import { themeIcons } from './constants.js';
 
-export function applyTheme(app, theme) {
+export function applyTheme(theme, toggleEl) {
 	const osPrefersDark = window.matchMedia(
 		"(prefers-color-scheme: dark)",
 	).matches;
@@ -11,17 +11,16 @@ export function applyTheme(app, theme) {
 		document.documentElement.classList.remove("light-theme");
 	}
 	storage.set("theme", theme);
-	updateThemeIcon(app);
+	updateThemeIcon(toggleEl);
 }
 
-export function cycleTheme(app) {
+export function cycleTheme(toggleEl) {
 	const order = ["auto", "light", "dark"];
 	const current = storage.get("theme", "auto");
 	const next = order[(order.indexOf(current) + 1) % order.length];
-	applyTheme(app, next);
+	applyTheme(next, toggleEl);
 }
 
-export function updateThemeIcon(app) {
-	app.elements.themeToggle.innerHTML =
-		themeIcons[storage.get("theme", "auto")];
+export function updateThemeIcon(toggleEl) {
+	toggleEl.innerHTML = themeIcons[storage.get("theme", "auto")];
 }
