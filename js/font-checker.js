@@ -13,15 +13,21 @@ export const fontChecker = {
     document.body.appendChild(this.testContainer);
   },
 
-  measureWidth(font) {
-    const el = document.createElement('span');
-    el.textContent = this.testString;
-    el.style.fontSize = this.testSize;
-    el.style.fontFamily = font;
-    this.testContainer.appendChild(el);
-    const w = el.offsetWidth;
-    this.testContainer.removeChild(el);
-    return w;
+  measureWidths(fonts) {
+    this.init();
+    const els = fonts.map((font) => {
+      const el = document.createElement('span');
+      el.textContent = this.testString;
+      el.style.fontSize = this.testSize;
+      el.style.fontFamily = font;
+      this.testContainer.appendChild(el);
+      return el;
+    });
+    const widths = els.map((el) => el.offsetWidth);
+    for (const el of els) {
+      this.testContainer.removeChild(el);
+    }
+    return widths;
   },
 
   isAvailable(font) {
@@ -31,9 +37,7 @@ export const fontChecker = {
     this.init();
 
     const generics = ['serif', 'sans-serif', 'monospace'];
-    let differs = 0;
-
-    for (const generic of generics) {
+    const pairs = generics.map((generic) => {
       const testEl = document.createElement('span');
       const baseEl = document.createElement('span');
       testEl.textContent = baseEl.textContent = this.testString;
@@ -43,26 +47,29 @@ export const fontChecker = {
 
       this.testContainer.appendChild(testEl);
       this.testContainer.appendChild(baseEl);
+      return { testEl, baseEl };
+    });
 
+    let differs = 0;
+    for (const { testEl, baseEl } of pairs) {
       if (testEl.offsetWidth !== baseEl.offsetWidth || testEl.offsetHeight !== baseEl.offsetHeight) {
         differs++;
       }
+    }
 
+    for (const { testEl, baseEl } of pairs) {
       this.testContainer.removeChild(testEl);
       this.testContainer.removeChild(baseEl);
     }
 
     let isAvailable = differs >= 2;
-
     if (isAvailable) {
       const candidates = fontconfigAliases[font];
       if (candidates) {
-        const wTarget = this.measureWidth(`"${font}", serif`);
-        for (const alias of candidates) {
-          if (wTarget === this.measureWidth(`"${alias}", serif`)) {
-            isAvailable = false;
-            break;
-          }
+        const widths = this.measureWidths([`"${font}", serif`, ...candidates.map((alias) => `"${alias}", serif`)]);
+        const wTarget = widths[0];
+        if (widths.slice(1).some((w) => w === wTarget)) {
+          isAvailable = false;
         }
       }
     }
