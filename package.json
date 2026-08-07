@@ -1,20 +1,21 @@
 {
-	"name": "default-fonts-per-os",
-	"version": "1.0.0",
-	"private": true,
-	"type": "module",
-	"scripts": {
-		"check": "biome check .",
-		"clean": "rm -rf node_modules .vitest bun.lock",
-		"dev": "serve . -l 9000",
-		"format": "biome format .",
-		"format:fix": "biome format --write .",
-		"lint": "biome lint .",
-		"lint:fix": "biome lint --write .",
-		"update": "bun update --latest"
-	},
-	"devDependencies": {
-		"@biomejs/biome": "^2.5.7",
-		"serve": "^14.2.6"
-	}
+  "name": "default-fonts-per-os",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "biome check .",
+    "check:fix": "biome check --write .",
+    "clean": "rm -rf node_modules .vitest bun.lock",
+    "dev": "serve . -l 9000",
+    "format": "biome format .",
+    "format:fix": "biome format --write .",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "update": "bun update --latest"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.7",
+    "serve": "^14.2.6"
+  }
 }

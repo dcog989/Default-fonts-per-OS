@@ -1,35 +1,42 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.5.7/schema.json",
-	"formatter": {
-		"enabled": true,
-		"indentStyle": "tab",
-		"indentWidth": 2,
-		"lineWidth": 80
-	},
-	"linter": {
-		"enabled": true,
-		"rules": {
-			"preset": "recommended",
-			"complexity": {
-				"noImportantStyles": "off"
-			}
-		}
-	},
-	"javascript": {
-		"formatter": {
-			"quoteStyle": "double",
-			"semicolons": "always",
-			"trailingCommas": "none"
-		}
-	},
-	"files": {
-		"includes": [
-			"**/*.{js,mjs,cjs,json,jsonc,html,htm,css}",
-			"!data",
-			"!repomix.config.json",
-			"!bun.lock",
-			"!.github",
-			"!node_modules"
-		]
-	}
+  "$schema": "https://biomejs.dev/schemas/2.5.7/schema.json",
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 120
+  },
+  "files": {
+    "includes": [
+      "**/*.{js,mjs,cjs,json,jsonc,html,htm,css}",
+      "!data",
+      "!repomix.config.json",
+      "!bun.lock",
+      "!.github",
+      "!node_modules"
+    ]
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single"
+    }
+  },
+  "css": {
+    "formatter": {
+      "quoteStyle": "single"
+    }
+  },
+  "html": {
+    "experimentalFullSupportEnabled": true,
+    "formatter": { "enabled": true }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "preset": "recommended",
+      "complexity": {
+        "noImportantStyles": "off"
+      }
+    }
+  }
 }

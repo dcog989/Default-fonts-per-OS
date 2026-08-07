@@ -1,88 +1,102 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fonts by OS</title>
-    <link rel="preload" href="css/main.css" as="style" />
-    <link href="css/main.css" rel="stylesheet" />
+    <link rel="preload" href="css/main.css" as="style">
+    <link href="css/main.css" rel="stylesheet">
     <link rel="icon" href="favicon.svg" type="image/svg+xml" sizes="any">
-</head>
+  </head>
 
-<body>
+  <body>
     <div class="header">
-        <h1>Fonts by OS</h1>
-        <button type="button" id="theme-toggle" class="theme-toggle-btn" title="Cycle: Auto / Light / Dark">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><title>Auto theme</title><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-        </button>
+      <h1>Fonts by OS</h1>
+      <button type="button" id="theme-toggle" class="theme-toggle-btn" title="Cycle: Auto / Light / Dark">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <title>Auto theme</title>
+          <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+          <line x1="8" y1="21" x2="16" y2="21" />
+          <line x1="12" y1="17" x2="12" y2="21" />
+        </svg>
+      </button>
     </div>
     <div class="controls-container">
-        <div class="controls">
-            <div class="control-group">
-                <strong>View:</strong>
-                <div class="switch-field" id="view-selector">
-                    <input type="radio" id="view-list" name="view" value="list" checked><label for="view-list">List</label>
-                    <input type="radio" id="view-table" name="view" value="table"><label for="view-table">Table</label>
-                    <input type="radio" id="view-compare" name="view" value="compare"><label for="view-compare" id="compare-label">Compare</label>
-                </div>
-            </div>
-            <div class="control-group">
-                <label for="font-size-selector"><strong>Font Size:</strong></label>
-                <select id="font-size-selector">
-                    <!-- Options will be populated by app.js -->
-                </select>
-            </div>
-            <div class="control-group" id="category-controls" style="display: none;">
-                <strong>Category:</strong>
-                <div class="switch-field" id="category-selector"></div>
-            </div>
-            <div class="control-group">
-                <button type="button" id="clear-all-button">Reset All</button>
-            </div>
+      <div class="controls">
+        <div class="control-group">
+          <strong>View:</strong>
+          <div class="switch-field" id="view-selector">
+            <input type="radio" id="view-list" name="view" value="list" checked><label for="view-list">List</label>
+            <input type="radio" id="view-table" name="view" value="table"><label for="view-table">Table</label>
+            <input type="radio" id="view-compare" name="view" value="compare">
+            <label for="view-compare" id="compare-label">Compare</label>
+          </div>
         </div>
-        <div class="controls">
-            <div class="control-group">
-                <strong>Filter:</strong>
-                <input type="search" id="search-input" placeholder="Search fonts...">
-            </div>
-            <div class="control-group">
-                <strong>Preview Text:</strong>
-                <input type="text" id="custom-text-input" placeholder="Type custom preview text...">
-            </div>
-            <div class="control-group">
-                <strong>Preset:</strong>
-                <select id="preset-selector">
-                    <option value="">Pangram</option>
-                    <option value="alphabet">Alphabet</option>
-                    <option value="chars">Numbers &amp; Symbols</option>
-                    <option value="lorem">Lorem ipsum</option>
-                </select>
-            </div>
-            <div class="control-group">
-                <button type="button" id="copy-selected-button" disabled>Copy Selected to Clipboard</button>
-            </div>
+        <div class="control-group">
+          <label for="font-size-selector"><strong>Font Size:</strong></label>
+          <select id="font-size-selector">
+            <!-- Options will be populated by app.js -->
+          </select>
         </div>
+        <div class="control-group" id="category-controls" style="display: none;">
+          <strong>Category:</strong>
+          <div class="switch-field" id="category-selector"></div>
+        </div>
+        <div class="control-group">
+          <button type="button" id="clear-all-button">Reset All</button>
+        </div>
+      </div>
+      <div class="controls">
+        <div class="control-group">
+          <strong>Filter:</strong>
+          <input type="search" id="search-input" placeholder="Search fonts...">
+        </div>
+        <div class="control-group">
+          <strong>Preview Text:</strong>
+          <input type="text" id="custom-text-input" placeholder="Type custom preview text...">
+        </div>
+        <div class="control-group">
+          <strong>Preset:</strong>
+          <select id="preset-selector">
+            <option value="">Pangram</option>
+            <option value="alphabet">Alphabet</option>
+            <option value="chars">Numbers &amp; Symbols</option>
+            <option value="lorem">Lorem ipsum</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <button type="button" id="copy-selected-button" disabled>Copy Selected to Clipboard</button>
+        </div>
+      </div>
     </div>
     <div id="content">
-        <p>Loading fonts...</p>
+      <p>Loading fonts...</p>
     </div>
 
     <button type="button" id="back-to-top" title="Go to top">Top</button>
 
     <footer class="footer">
-        <span>v1.0.0</span>
-        <a href="https://github.com/dcog989/Default-fonts-per-OS" target="_blank" rel="noopener">Source</a>
+      <span>v1.0.0</span>
+      <a href="https://github.com/dcog989/Default-fonts-per-OS" target="_blank" rel="noopener">GitHub</a>
     </footer>
 
     <div id="font-modal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <button type="button" class="modal-close" aria-label="Close">&times;</button>
-            <div id="modal-body"></div>
-        </div>
+      <div class="modal-content">
+        <button type="button" class="modal-close" aria-label="Close">&times;</button>
+        <div id="modal-body"></div>
+      </div>
     </div>
 
     <script type="module" src="js/app.js"></script>
-</body>
-
+  </body>
 </html>
