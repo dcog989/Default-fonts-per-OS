@@ -1,6 +1,6 @@
 # ![logo](favicon.svg) Fonts by OS
 
-An interactive tool to browse and compare the default fonts across major operating systems.
+Browse and compare the default fonts across major operating systems.
 
 **[Live Demo](https://dcog989.github.io/Default-fonts-per-OS/)**
 
