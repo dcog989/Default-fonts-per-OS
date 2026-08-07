@@ -13,6 +13,9 @@
   --c-link: #64b5f6;
   --c-websafe: #4caf50;
   --c-accent: #3cdda4;
+  --c-muted: #9a9a9a;
+  --c-websafe-bg: #2e7d32;
+  --c-unavailable-bg: #b71c1c;
 }
 
 html.light-theme {
@@ -27,6 +30,7 @@ html.light-theme {
   --c-unavailable: #d93030;
   --c-link: #0d47a1;
   --c-websafe: #388e3c;
+  --c-muted: #666;
 }
 
 html {
@@ -436,12 +440,12 @@ fieldset.font-display-item {
 }
 
 .modal-tag.web-safe {
-  background: var(--c-websafe);
+  background: var(--c-websafe-bg);
   color: #fff;
 }
 
 .modal-tag.not-available {
-  background: var(--c-unavailable);
+  background: var(--c-unavailable-bg);
   color: #fff;
 }
 

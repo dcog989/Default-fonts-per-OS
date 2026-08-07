@@ -10,7 +10,7 @@
   </head>
 
   <body>
-    <div class="header">
+    <header class="header">
       <h1>Fonts by OS</h1>
       <button type="button" id="theme-toggle" class="theme-toggle-btn" title="Cycle: Auto / Light / Dark">
         <svg
@@ -30,7 +30,7 @@
           <line x1="12" y1="17" x2="12" y2="21" />
         </svg>
       </button>
-    </div>
+    </header>
     <div class="controls-container">
       <div class="controls">
         <div class="control-group">
@@ -58,15 +58,15 @@
       </div>
       <div class="controls">
         <div class="control-group">
-          <strong>Filter:</strong>
+          <label for="search-input"><strong>Filter:</strong></label>
           <input type="search" id="search-input" placeholder="Search fonts...">
         </div>
         <div class="control-group">
-          <strong>Preview Text:</strong>
+          <label for="custom-text-input"><strong>Preview Text:</strong></label>
           <input type="text" id="custom-text-input" placeholder="Type custom preview text...">
         </div>
         <div class="control-group">
-          <strong>Preset:</strong>
+          <label for="preset-selector"><strong>Preset:</strong></label>
           <select id="preset-selector">
             <option value="">Pangram</option>
             <option value="alphabet">Alphabet</option>
@@ -79,9 +79,9 @@
         </div>
       </div>
     </div>
-    <div id="content">
+    <main id="content">
       <p>Loading fonts...</p>
-    </div>
+    </main>
 
     <button type="button" id="back-to-top" title="Go to top">Top</button>
 
