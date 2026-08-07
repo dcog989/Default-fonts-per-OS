@@ -6,7 +6,7 @@
 	"scripts": {
 		"check": "biome check .",
 		"clean": "rm -rf .context node_modules .vitest bun.lock",
-		"dev": "bun server.js",
+		"dev": "serve . -l 9000",
 		"format": "biome format .",
 		"format:fix": "biome format --write .",
 		"lint": "biome lint .",
@@ -14,6 +14,7 @@
 		"update": "bun update --latest"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^2.5.7"
+		"@biomejs/biome": "^2.5.7",
+		"serve": "^14.2.6"
 	}
 }

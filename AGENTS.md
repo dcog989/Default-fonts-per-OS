@@ -4,7 +4,7 @@
 
 - Name: Default-fonts-per-OS
 - Description: Interactive browser tool to browse and compare default fonts across major operating systems (Windows 11, macOS, iOS, Android, Linux). Vanilla JS SPA with multiple views (list/table/comparison), live font preview, filtering, and persisted settings.
-- Tech: Vanilla HTML/CSS/JS (no framework), bun (dependency-free `server.js` for local dev), Biome for lint/format, GitHub Pages for deploy.
+- Tech: Vanilla HTML/CSS/JS (no framework), bun (npx `serve` for local dev), Biome for lint/format, GitHub Pages for deploy.
 
 ## Key Files
 
@@ -23,7 +23,7 @@
 ## Development Workflow
 
 - Install: `bun install` (only dev dependency is `@biomejs/biome`)
-- Dev: `bun run dev` (dependency-free `server.js` using `Bun.serve`, http://localhost:9000)
+- Dev: `bun run dev` (Vercel `serve` static server, http://localhost:9000)
 - Test: no test suite configured
 - Lint: `bun run lint` (Biome)
 - Format: `bun run format` / `bun run format:fix` (Biome)
