@@ -17,7 +17,7 @@
 - `js/preferences.js` — user preferences
 - `js/theme.js` — Light/Dark/Auto themes
 - `js/dragdrop.js` — drag and drop interactions
-- `data/*.json` — per-OS default font data (android, ios-26, linux-*, macos-tahoe, windows-11)
+- `js/data.js` — inlined per-OS default font data (single source of truth)
 - `.github/workflows/deploy.yml` — CI/CD to GitHub Pages
 
 ## Development Workflow

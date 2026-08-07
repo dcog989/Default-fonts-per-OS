@@ -1,5 +1,6 @@
 import { copySelectedFonts } from './clipboard.js';
 import { DEFAULT_FONT_SIZE, presets } from './constants.js';
+import { operatingSystems } from './data.js';
 import { onDragEnd, onDragOver, onDragStart, onDrop } from './dragdrop.js';
 import { closeFontModal, onFontClick } from './modal.js';
 import { restoreOsOrder, saveComparisonSet, saveFilters } from './preferences.js';
@@ -7,7 +8,7 @@ import { runFontAvailabilityChecks, viewRenderers } from './renderer.js';
 import { storage } from './storage.js';
 import { applyTheme, cycleTheme } from './theme.js';
 
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
   const App = {
     elements: {},
 
@@ -254,30 +255,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     },
   };
 
-  const files = [
-    'windows-11',
-    'macos-tahoe',
-    'ios-26',
-    'android',
-    'linux-gnome',
-    'linux-kde-plasma',
-    'linux-xfce',
-    'linux-cinnamon',
-  ];
-  let operatingSystems;
-  try {
-    const responses = await Promise.all(
-      files.map((f) =>
-        fetch(`data/${f}.json`).then((r) => {
-          if (!r.ok) throw new Error(`Failed to load ${f}.json (${r.status})`);
-          return r;
-        }),
-      ),
-    );
-    operatingSystems = await Promise.all(responses.map((r) => r.json()));
-  } catch (err) {
-    document.getElementById('content').innerHTML = `<p>Failed to load font data: ${err.message}</p>`;
-    return;
-  }
   App.init({ operatingSystems });
 });
