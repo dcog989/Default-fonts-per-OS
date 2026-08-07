@@ -8,7 +8,7 @@ function createFontItemHTML(app, font, viewType) {
   const webSafeIndicator = app.state.webSafeFonts.has(font.name)
     ? `<span class="web-safe-indicator" title="Web-safe (found on 3+ OSes)"></span>`
     : '';
-  const checkboxHTML = `<input type="checkbox" class="compare-checkbox" data-font-name="${safeName}" ${isChecked}>`;
+  const checkboxHTML = `<input type="checkbox" class="compare-checkbox" data-font-name="${safeName}" aria-label="Compare ${safeName}" ${isChecked}>`;
   const textToShow = app.state.filters.text || defaultPangram;
 
   if (viewType === 'table') {

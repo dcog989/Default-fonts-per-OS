@@ -9,7 +9,7 @@
   --c-border: #666;
   --c-control-bg: #3a3a3a;
   --c-control-bg-active: #5c5c5c;
-  --c-unavailable: #df7a7a;
+  --c-unavailable: #ef9a9a;
   --c-link: #64b5f6;
   --c-websafe: #4caf50;
   --c-accent: #3cdda4;
@@ -27,7 +27,7 @@ html.light-theme {
   --c-border: #ccc;
   --c-control-bg: #e0e0e0;
   --c-control-bg-active: #c7c7c7;
-  --c-unavailable: #d93030;
+  --c-unavailable: #c62828;
   --c-link: #0d47a1;
   --c-websafe: #388e3c;
   --c-muted: #666;
