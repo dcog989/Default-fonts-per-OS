@@ -22,9 +22,18 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v6
+
+      - name: Build (bundle + minify)
+        run: |
+          npx --yes esbuild@0.28.1 js/app.js --bundle --minify --format=esm --outfile=dist/js/app.js
+          npx --yes esbuild@0.28.1 css/main.css --minify --outfile=dist/css/main.css
+          cp index.html dist/index.html
+          cp favicon.svg dist/favicon.svg
+          sed -i '/modulepreload/d' dist/index.html
+
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:
-          path: .
+          path: dist
       - id: deployment
         uses: actions/deploy-pages@v5
