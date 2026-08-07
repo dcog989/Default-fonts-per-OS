@@ -1,3 +1,5 @@
+export const DEFAULT_FONT_SIZE = "16";
+
 export const defaultPangram =
 	"When zombies arrive, quickly fax Judge Pat. 1234567890.";
 

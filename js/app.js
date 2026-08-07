@@ -1,4 +1,4 @@
-import { presets } from "./constants.js";
+import { DEFAULT_FONT_SIZE, presets } from "./constants.js";
 import { onDragEnd, onDragOver, onDragStart, onDrop } from "./dragdrop.js";
 import { copySelectedFonts } from "./clipboard.js";
 import {
@@ -128,10 +128,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 			this.elements.customTextInput.addEventListener("input", (e) => {
 				this.state.filters.text = e.target.value;
 				this.elements.presetSelector.value = "";
+				saveFilters(this);
 				this.render();
 			});
 			this.elements.presetSelector.addEventListener("change", (e) => {
 				this.state.filters.text = presets[e.target.value] ?? "";
+				saveFilters(this);
 				this.render();
 			});
 			this.elements.categorySelector.addEventListener("change", (e) => {
@@ -208,6 +210,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 			).checked = true;
 			saveFilters(this);
 
+			this.applyFontSize(DEFAULT_FONT_SIZE);
+			applyTheme("auto", this.elements.themeToggle);
+
 			this.state.comparisonSet.clear();
 			saveComparisonSet(this);
 			this.updateCompareLabel();
@@ -275,7 +280,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 			const savedTheme = storage.get("theme", "auto");
 			applyTheme(savedTheme, this.elements.themeToggle);
 
-			const savedFontSize = storage.get("fontSize", "16");
+			const savedFontSize = storage.get("fontSize", DEFAULT_FONT_SIZE);
 			this.elements.fontSizeSelector.value = savedFontSize;
 			this.setSampleFontSize(savedFontSize);
 
@@ -286,6 +291,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 			if (savedFilters) {
 				this.state.filters = savedFilters;
 				this.elements.searchInput.value = savedFilters.search;
+				this.elements.customTextInput.value = savedFilters.text ?? "";
 				const categoryInput = this.elements.categorySelector.querySelector(
 					`input[value="${savedFilters.category}"]`,
 				);
